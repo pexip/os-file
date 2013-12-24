@@ -1,13 +1,15 @@
 Source: file
 Section: utils
 Priority: standard
-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
-Uploaders: Judit Foglszinger <fgrfgr@freenet.de>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
+XSBC-Pexip-Original-Uploaders: Judit Foglszinger <fgrfgr@freenet.de>
 Build-Depends:
  debhelper (>= 8), autotools-dev, python, python-all-dev, python-all-dbg,
  zlib1g-dev
 Standards-Version: 3.9.2
 Homepage: http://www.darwinsys.com/file/
+XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
 
 Package: file
 Section: utils

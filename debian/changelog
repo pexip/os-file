@@ -1,3 +1,9 @@
+file (5.09-2pexip1) pexip; urgency=low
+
+  * Prepare Pexip packaging
+
+ -- John-Mark Bell <jmb@pexip.com>  Tue, 24 Dec 2013 16:57:52 +0000
+
 file (5.09-2) unstable; urgency=low
 
   * Adding build-arch and build-indep to rules.
