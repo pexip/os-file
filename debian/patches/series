@@ -1,3 +1,5 @@
 01-file-localmagic.patch
 02-file-make.patch
 03-doc-manpages.patch
+CVE-2012-1571.patch
+CVE-2014-1943.patch

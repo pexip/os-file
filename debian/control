@@ -1,7 +1,8 @@
 Source: file
 Section: utils
 Priority: standard
-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
 Uploaders: Judit Foglszinger <fgrfgr@freenet.de>
 Build-Depends:
  debhelper (>= 8), autotools-dev, python, python-all-dev, python-all-dbg,
