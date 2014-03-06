@@ -2,7 +2,8 @@ Source: file
 Section: utils
 Priority: standard
 Maintainer: Pexip AS <packaging@pexip.com>
-XSBC-Pexip-Original-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
+XSBC-Pexip-Original-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
 XSBC-Pexip-Original-Uploaders: Judit Foglszinger <fgrfgr@freenet.de>
 Build-Depends:
  debhelper (>= 8), autotools-dev, python, python-all-dev, python-all-dbg,

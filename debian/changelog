@@ -1,8 +1,20 @@
-file (5.09-2pexip1) pexip; urgency=low
+file (5.09-2ubuntu0.2pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging
 
- -- John-Mark Bell <jmb@pexip.com>  Tue, 24 Dec 2013 16:57:52 +0000
+ -- John-Mark Bell <jmb@pexip.com>  Thu, 06 Mar 2014 09:42:25 +0000
+
+file (5.09-2ubuntu0.2) precise-security; urgency=medium
+
+  * SECURITY UPDATE: denial of service via crafted CDF file
+    - debian/patches/CVE-2012-1571.patch: 
+    - CVE-2012-1571
+  * SECURITY UPDATE: denial of service via crafted indirect offset value
+    - debian/patches/CVE-2013-1943.patch: properly handle recursion in
+      src/ascmagic.c, src/file.h, src/funcs.c, src/softmagic.c.
+    - CVE-2013-1943
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 26 Feb 2014 10:10:03 -0500
 
 file (5.09-2) unstable; urgency=low
 
