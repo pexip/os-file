@@ -1,3 +1,39 @@
+file (5.09-2ubuntu0.4) precise-security; urgency=medium
+
+  * SECURITY UPDATE: denial of service via awk rule backtracking
+    - debian/patches/CVE-2013-7345.patch: limit to 100 repetitions in
+      magic/Magdir/commands.
+    - CVE-2013-7345
+  * SECURITY UPDATE: denial of service in cdf_read_short_sector
+    - debian/patches/CVE-2014-0207.patch: properly calculate sizes in
+      src/cdf.c.
+    - CVE-2014-0207
+  * SECURITY UPDATE: denial of service in mconvert
+    - debian/patches/CVE-2014-3478.patch: properly handle truncated pascal
+      string size in src/softmagic.c.
+    - CVE-2014-3478
+  * SECURITY UPDATE: denial of service in cdf_check_stream_offset
+    - debian/patches/CVE-2014-3479.patch: properly calculate sizes in
+      src/cdf.c.
+    - CVE-2014-3479
+  * SECURITY UPDATE: denial of service in cdf_count_chain
+    - debian/patches/CVE-2014-3480.patch: properly calculate sizes in
+      src/cdf.c.
+    - CVE-2014-3480
+  * SECURITY UPDATE: denial of service in cdf_read_property_info
+    - debian/patches/CVE-2014-3487.patch: properly calculate sizes in
+      src/cdf.c.
+    - CVE-2014-3487
+  * SECURITY UPDATE: denial of service via awk rule backtracking
+    - debian/patches/CVE-2014-3538.patch: allow specifying lengths for
+      regex in src/apprentice.c, src/file.h, src/softmagic.c, adjust
+      existing expressions in magic/Magdir/commands, magic/Magdir/fortran,
+      magic/Magdir/graphviz, magic/Magdir/marc21, magic/Magdir/scientific,
+      magic/Magdir/troff, update manpage in doc/magic.man.
+    - CVE-2014-3538
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 10 Jul 2014 12:00:51 -0400
+
 file (5.09-2ubuntu0.3) precise-security; urgency=medium
 
   * SECURITY UPDATE: denial of service via crafted offset in PE executable
