@@ -1,3 +1,18 @@
+file (5.09-2ubuntu0.5pexip1) pexip; urgency=low
+
+  * New upstream release.
+
+ -- John-Mark Bell <jmb@pexip.com>  Sun, 05 Oct 2014 01:00:12 +0100
+
+file (5.09-2ubuntu0.5) precise-security; urgency=medium
+
+  * SECURITY UPDATE: buffer underflow in CDF file identification
+    - debian/patches/CVE-2014-3587.patch: modify src/cdf.c to detect and
+      abort on buffer underflows.
+    - CVE-2014-3587
+
+ -- Seth Arnold <seth.arnold@canonical.com>  Wed, 27 Aug 2014 23:34:57 -0700
+
 file (5.09-2ubuntu0.4pexip1) pexip; urgency=low
 
   * New upstream release.
