@@ -1,3 +1,27 @@
+file (5.09-2ubuntu0.6) precise-security; urgency=medium
+
+  * SECURITY UPDATE: DoS via insufficient note headers
+    - debian/patches/CVE-2014-3710.patch: handle running out of not headers
+      in src/readelf.c.
+    - CVE-2014-3710
+  * SECURITY UPDATE: DoS in ELF parser
+    - debian/patches/CVE-2014-8116.patch: limit number of headers and
+      capabilities in src/elfclass.h, src/readelf.c.
+    - CVE-2014-8116
+  * SECURITY UPDATE: DoS via missing recursion limits
+    - debian/patches/CVE-2014-8117.patch: lower recursion level and allow
+      it to be set from the command line in src/file.{c,h},
+      src/file_opts.h, src/funcs.c, src/magic.c, src/magic.h,
+      src/softmagic.c, add new option to documentation in
+      doc/file.man, doc/libmagic.man.
+    - CVE-2014-8117
+  * SECURITY UPDATE: DoS via long pascal strings
+    - debian/patches/pr398-truncate-pascal-strings.patch: correctly
+      calculate size in src/softmagic.c.
+    - No CVE number
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 27 Jan 2015 10:10:29 -0500
+
 file (5.09-2ubuntu0.5) precise-security; urgency=medium
 
   * SECURITY UPDATE: buffer underflow in CDF file identification
