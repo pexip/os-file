@@ -1,3 +1,16 @@
+file (5.09-2ubuntu0.6pexip2) pexip; urgency=low
+
+  * SECURITY UPDATE: DoS via excess ELF note headers
+    - debian/patches/CVE-2014-9620.patch: limit number of note headers
+      in src/elfclass.h, src/readelf.c.
+    - CVE-2014-9620
+  * SECURITY UPDATE: DoS via out-of-bounds read in ELF parser
+    - debian/patches/CVE-2014-9653.patch: protect against partial reads
+      in src/readelf.c.
+    - CVE-2014-9653
+
+ -- John-Mark Bell <jmb@pexip.com>  Sat, 07 Mar 2015 18:40:39 +0000
+
 file (5.09-2ubuntu0.6pexip1) pexip; urgency=low
 
   * New upstream release.
