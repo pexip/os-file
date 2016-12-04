@@ -29,7 +29,7 @@
 >4	belong	=2		\b, version 2
 
 # Type: Git index file
-# From: Frédéric Brière <fbriere@fbriere.net>
+# From: Frederic Briare <fbriere@fbriere.net>
 0	string	DIRC		Git index
 >4	belong	>0		\b, version %d
 >>8	belong	>0		\b, %d entries

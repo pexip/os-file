@@ -23,7 +23,7 @@ OPT('c', "checking-printout", 0, "    print the parsed form of the magic file, u
     "                               before installing it\n")
 OPT('e', "exclude", 1, " TEST         exclude TEST from the list of test to be\n"
     "                               performed for file. Valid tests are:\n"
-    "                               ascii, apptype, compress, elf, soft, tar, tokens, troff\n")
+    "                               %o\n")
 OPT('f', "files-from", 1, " FILE      read the filenames to be examined from FILE\n")
 OPT('F', "separator", 1, " STRING     use string as separator instead of `:'\n")
 OPT('i', "mime", 0, "                 output MIME type strings (--mime-type and\n"
@@ -32,8 +32,8 @@ OPT_LONGONLY("apple", 0, "                output the Apple CREATOR/TYPE\n")
 OPT_LONGONLY("mime-type", 0, "            output the MIME type\n")
 OPT_LONGONLY("mime-encoding", 0, "        output the MIME encoding\n")
 OPT('k', "keep-going", 0, "           don't stop at the first match\n")
-#ifdef S_IFLNK
 OPT('l', "list", 0, "                 list magic strength\n")
+#ifdef S_IFLNK
 OPT('L', "dereference", 0, "          follow symlinks (default)\n")
 OPT('h', "no-dereference", 0, "       don't follow symlinks\n")
 #endif
@@ -43,6 +43,12 @@ OPT('0', "print0", 0, "               terminate filenames with ASCII NUL\n")
 #if defined(HAVE_UTIME) || defined(HAVE_UTIMES)
 OPT('p', "preserve-date", 0, "        preserve access times on files\n")
 #endif
+OPT('P', "parameter", 0, "            set file engine parameter limits\n"
+    "                               indir        15 recursion limit for indirection\n"
+    "                               name         30 use limit for name/use magic\n"
+    "                               elf_notes   256 max ELF notes processed\n"
+    "                               elf_phnum   128 max ELF prog sections processed\n"
+    "                               elf_shnum 32768 max ELF sections processed\n")
 OPT('r', "raw", 0, "                  don't translate unprintable chars to \\ooo\n")
 OPT('s', "special-files", 0, "        treat special (block/char devices) files as\n"
     "                             ordinary ones\n")
