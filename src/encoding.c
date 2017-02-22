@@ -35,7 +35,7 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: encoding.c,v 1.5 2010/07/21 16:47:17 christos Exp $")
+FILE_RCSID("@(#)$File: encoding.c,v 1.9 2013/11/19 20:45:50 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
@@ -71,18 +71,22 @@ file_encoding(struct magic_set *ms, const unsigned char *buf, size_t nbytes, uni
 	int rv = 1, ucs_type;
 	unsigned char *nbuf = NULL;
 
-	mlen = (nbytes + 1) * sizeof(nbuf[0]);
-	if ((nbuf = CAST(unsigned char *, calloc((size_t)1, mlen))) == NULL) {
-		file_oomem(ms, mlen);
-		goto done;
-	}
+	*type = "text";
+	*ulen = 0;
+	*code = "unknown";
+	*code_mime = "binary";
+
 	mlen = (nbytes + 1) * sizeof((*ubuf)[0]);
 	if ((*ubuf = CAST(unichar *, calloc((size_t)1, mlen))) == NULL) {
 		file_oomem(ms, mlen);
 		goto done;
 	}
+	mlen = (nbytes + 1) * sizeof(nbuf[0]);
+	if ((nbuf = CAST(unsigned char *, calloc((size_t)1, mlen))) == NULL) {
+		file_oomem(ms, mlen);
+		goto done;
+	}
 
-	*type = "text";
 	if (looks_ascii(buf, nbytes, *ubuf, ulen)) {
 		DPRINTF(("ascii %" SIZE_T_FORMAT "u\n", *ulen));
 		*code = "ASCII";
@@ -93,7 +97,6 @@ file_encoding(struct magic_set *ms, const unsigned char *buf, size_t nbytes, uni
 		*code_mime = "utf-8";
 	} else if (file_looks_utf8(buf, nbytes, *ubuf, ulen) > 1) {
 		DPRINTF(("utf8 %" SIZE_T_FORMAT "u\n", *ulen));
-		*code = "UTF-8 Unicode (with BOM)";
 		*code = "UTF-8 Unicode";
 		*code_mime = "utf-8";
 	} else if ((ucs_type = looks_ucs16(buf, nbytes, *ubuf, ulen)) != 0) {
@@ -133,8 +136,7 @@ file_encoding(struct magic_set *ms, const unsigned char *buf, size_t nbytes, uni
 	}
 
  done:
-	if (nbuf)
-		free(nbuf);
+	free(nbuf);
 
 	return rv;
 }

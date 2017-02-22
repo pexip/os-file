@@ -27,7 +27,7 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: cdf_time.c,v 1.10 2011/02/10 17:03:16 christos Exp $")
+FILE_RCSID("@(#)$File: cdf_time.c,v 1.14 2014/04/17 12:44:01 christos Exp $")
 #endif
 
 #include <time.h>
@@ -117,11 +117,11 @@ cdf_timestamp_to_timespec(struct timespec *ts, cdf_timestamp_t t)
 	tm.tm_hour = (int)(t % 24);
 	t /= 24;
 
-	// XXX: Approx
+	/* XXX: Approx */
 	tm.tm_year = (int)(CDF_BASE_YEAR + (t / 365));
 
 	rdays = cdf_getdays(tm.tm_year);
-	t -= rdays;
+	t -= rdays - 1;
 	tm.tm_mday = cdf_getday(tm.tm_year, (int)t);
 	tm.tm_mon = cdf_getmonth(tm.tm_year, (int)t);
 	tm.tm_wday = 0;
@@ -166,29 +166,29 @@ cdf_timespec_to_timestamp(cdf_timestamp_t *t, const struct timespec *ts)
 }
 
 char *
-cdf_ctime(const time_t *sec)
+cdf_ctime(const time_t *sec, char *buf)
 {
-	static char ctbuf[26];
-	char *ptr = ctime(sec);
+	char *ptr = ctime_r(sec, buf);
 	if (ptr != NULL)
-		return ptr;
-	(void)snprintf(ctbuf, sizeof(ctbuf), "*Bad* 0x%16.16llx\n",
+		return buf;
+	(void)snprintf(buf, 26, "*Bad* 0x%16.16" INT64_T_FORMAT "x\n",
 	    (long long)*sec);
-	return ctbuf;
+	return buf;
 }
 
 
-#ifdef TEST
+#ifdef TEST_TIME
 int
 main(int argc, char *argv[])
 {
 	struct timespec ts;
+	char buf[25];
 	static const cdf_timestamp_t tst = 0x01A5E403C2D59C00ULL;
 	static const char *ref = "Sat Apr 23 01:30:00 1977";
 	char *p, *q;
 
 	cdf_timestamp_to_timespec(&ts, tst);
-	p = cdf_ctime(&ts.tv_sec);
+	p = cdf_ctime(&ts.tv_sec, buf);
 	if ((q = strchr(p, '\n')) != NULL)
 		*q = '\0';
 	if (strcmp(ref, p) != 0)

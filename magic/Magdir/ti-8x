@@ -222,7 +222,7 @@
 >49		byte		0x24		type: application,
 >49		byte		0x25		type: certificate,
 >49		byte		0x3e		type: license,
->74		lelong		>0		size: %ld bytes
+>74		lelong		>0		size: %d bytes
 
 # VTi & TiEmu skins (TI Graphing Calculators).
 # From: Romain Lievin (roms@lpg.ticalc.org).
