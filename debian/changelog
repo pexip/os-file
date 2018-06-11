@@ -1,3 +1,10 @@
+file (1:5.30-1+deb9u2) stable; urgency=high
+
+  * Avoid reading past the end of buffer. Closes: #901351
+    [CVE-2018-10360]
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 11 Jun 2018 23:16:09 +0200
+
 file (1:5.30-1+deb9u1) stretch-security; urgency=high
 
   * Non-maintainer upload by the Security Team.

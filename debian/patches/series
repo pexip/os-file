@@ -25,6 +25,7 @@ cherry-pick.FILE5_30-48-gaee11eef.fix-out-of-bounds-read-found-by-oss-fuzz.patch
 cherry-pick.FILE5_30-49-gbf90083a.fix-memory-handling.patch
 cherry-pick.FILE5_30-52-gd8233d09.check-one-more-read-found-by-oss-fuzz.patch
 cherry-pick.FILE5_31-36-g35c94dc6.Fix-always-true-condition-Thomas-Jarosch.patch
+cherry-pick.FILE5_33-31-ga642587a.avoid-reading-past-the-end-of-buffer.patch
 
 # local modifications
 local.support-local-definitions-in-etc-magic.patch
