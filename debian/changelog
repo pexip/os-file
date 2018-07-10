@@ -1,31 +1,138 @@
+file (1:5.30-1+deb9u1pexip1) pexip; urgency=medium
+
+  * Migrate to Stretch
+
+ -- John-Mark Bell <jmb@pexip.com>  Tue, 10 Jul 2018 19:10:09 +0100
+
+file (1:5.30-1+deb9u1) stretch-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * CVE-2017-1000249: stack based buffer overflow via specially crafted .notes
+    section in an ELF binary
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Fri, 01 Sep 2017 21:23:02 +0200
+
+file (1:5.30-1) unstable; urgency=high
+
+  * New upstream version 5.30
+  * Cherry-pick commits that fix issues found by oss-fuzz
+  * Revert new features introduced since 1:5.29-3
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sat, 29 Apr 2017 10:57:11 +0200
+
+file (1:5.29-3) unstable; urgency=medium
+
+  * Restore full local.support-local-definitions-in-etc-magic patch.
+    Closes: #852476
+  * Include all upstream commits since the 5.29 release
+  * Improve detection of Flash data. Closes: #838860
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 26 Jan 2017 00:29:24 +0100
+
+file (1:5.29-2) unstable; urgency=medium
+
+  * Include all upstream commits since the 5.29 release. Addresses:
+    - Detect compiled YARA rules. Closes: #833872
+    - Detect old Word for Mac documents. Closes: #842117
+  * Disable detection of Algol68 files, way too many false positives
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 13 Dec 2016 16:06:43 +0100
+
+file (1:5.29-1) unstable; urgency=medium
+
+  * New upstream version 5.29. Addresses (in order of appearance):
+    - "no read permission" if read from empty pipe. Closes: #508963
+    - Mistakes hungarian text as dos executables. Closes: #641012
+    - Does not recognize some GPG key public rings. Closes: #729286
+    - Show more information for MySQL files. Closes: #751826
+    - Linux kernel version string truncated. Closes: #756949
+    - Document file's '-d' option. Closes: #764462
+    - Detect JPEG-XR. Closes: #771303
+    - Detect Material exchange container format (mxf). Closes: #782744
+    - Strengthen detection of Embedded OpenType (EOT). Closes: #784572
+    - Mistakes some text as bitmap. Closes: #799352
+    - Dectect swp files from nano, vim, and kate. Closes: #803219
+    - Mistakes some SVG files as HTML. Closes: #829199
+  * Fix FTCBFS: Remove stage1 profile in favour of a proper arch/indep
+    split. Thanks Helmut Grohne. Closes: #841030
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 25 Oct 2016 21:09:24 +0200
+
+file (1:5.28-4) unstable; urgency=low
+
+  * Ship the compiled magic file in a separate package so libmagic1 is
+    finally multi-arch compliant. Thanks Jakub Wilk for the final
+    impetus and suggestions. Closes: #670006 (take two)
+  * Declare compliance with Debian policy 3.9.8
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 21 Jul 2016 21:42:43 +0200
+
+file (1:5.28-3) unstable; urgency=low
+
+  * Packaging cleanup, no code changes
+    - No longer ship file-dbg, use -dbgsym instead
+    - Remove cruft: lintian override, obsolete substvars, explicit
+      usage of xz
+    - Re-word package descriptions
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 17 Jul 2016 14:03:33 +0200
+
+file (1:5.28-2) unstable; urgency=high
+
+  * Enable full hardening build
+  * Cherry-pick commits since 5.28 release:
+    - Avoid "can't break line" warnings from lintian
+    - Don't copy NULL
+    - Avoid double encoding with python3. Closes: #828833
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 30 Jun 2016 01:39:07 +0200
+
+file (1:5.28-1) unstable; urgency=medium
+
+  * New upstream version 5.28
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 27 Jun 2016 16:10:45 +0200
+
+file (1:5.25-2) unstable; urgency=medium
+
+  * Fix --mime-encoding. Closes: #799690
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 22 Sep 2015 19:44:20 +0200
+
+file (1:5.25-1) unstable; urgency=low
+
+  * New upstream version 5.25
+  * Import important commits post 5.25 release:
+    - PR/479: check the format length modifiers, protect against
+      0-divide and offset out of bounds reads
+    - print annotations
+  * Disable detection of VAX COFF executables. Closes: #697846
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 18 Sep 2015 08:10:45 +0200
+
+file (1:5.24-2) unstable; urgency=medium
+
+  * Fix handling of file's --parameter option. Closes: #798410
+  * Fix strength of Python script detection. Closes: #698569, #798796
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 13 Sep 2015 12:26:56 +0200
+
+file (1:5.24-1) unstable; urgency=low
+
+  * New upstream version 5.24. Addresses:
+    - mistakes some PDFs, Closes: #520098
+    - '#!' should have a bigger strength, Closes: #698569
+  * Update build dependencies:
+    - dh-python
+    - Recent dpkg-dev version for minimal restriction formula support
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 04 Sep 2015 18:56:25 +0200
+
 file (1:5.22+15-2+deb9u3pexip1) pexip; urgency=low
 
   * Migrate to Jessie
 
  -- John-Mark Bell <jmb@pexip.com>  Wed, 22 Feb 2017 13:02:41 +0000
-
-file (1:5.22+15-2+deb8u3) stable; urgency=medium
-
-  * Fix memory leak in magic loader. Closes: #840754
-
- -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 04 Dec 2016 10:00:07 +0100
-
-file (1:5.22+15-2+deb8u2) stable; urgency=high
-
-  * Fix CVE-2015-8865:
-    Buffer over-write in finfo_open with malformed magic file.
-
- -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 09 May 2016 08:18:53 +0200
-
-file (1:5.22+15-2+deb8u1) stable; urgency=medium
-
-  * Fix handling of file's --parameter option. Closes: #798410
-    - The file program segfaults after processing the --parameter
-      parameter. [commit FILE5_24-22-g27b4e34]
-    - Any --parameter values have no effect if used with
-      --files-from. [commit FILE5_24-23-g4ddb783]
-
- -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 13 Sep 2015 18:27:47 +0200
 
 file (1:5.22+15-2) unstable; urgency=medium
 
