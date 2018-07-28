@@ -1,3 +1,16 @@
+file (1:5.30-1+deb9u2pexip1) pexip; urgency=medium
+
+  * New upstream release
+
+ -- John-Mark Bell <jmb@pexip.com>  Sat, 28 Jul 2018 22:50:50 +0100
+
+file (1:5.30-1+deb9u2) stable; urgency=high
+
+  * Avoid reading past the end of buffer. Closes: #901351
+    [CVE-2018-10360]
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 11 Jun 2018 23:16:09 +0200
+
 file (1:5.30-1+deb9u1pexip1) pexip; urgency=medium
 
   * Migrate to Stretch
