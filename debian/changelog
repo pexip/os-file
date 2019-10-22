@@ -1,3 +1,10 @@
+file (1:5.30-1+deb9u3) stretch-security; urgency=high
+
+  * Cherry-pick commit to restrict the number of CDF_VECTOR elements.
+    Closes: #942830 [CVE-2019-18218]
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 22 Oct 2019 22:20:07 +0200
+
 file (1:5.30-1+deb9u2) stable; urgency=high
 
   * Avoid reading past the end of buffer. Closes: #901351
