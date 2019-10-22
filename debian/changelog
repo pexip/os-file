@@ -1,24 +1,99 @@
-file (1:5.30-1+deb9u3) stretch-security; urgency=high
+file (1:5.35-4+deb10u1) buster-security; urgency=high
 
   * Cherry-pick commit to restrict the number of CDF_VECTOR elements.
     Closes: #942830 [CVE-2019-18218]
 
- -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 22 Oct 2019 22:20:07 +0200
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 22 Oct 2019 21:57:17 +0200
 
-file (1:5.30-1+deb9u2) stable; urgency=high
+file (1:5.35-4) unstable; urgency=medium
+
+  * Cherry-pick fix for JSON detection. Closes: 922874
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sat, 02 Mar 2019 08:05:54 +0100
+
+file (1:5.35-3) unstable; urgency=medium
+
+  * Cherry-pick many commits since 5.35 release that seem wise to
+    include in buster.
+    * Closes: #922967 [CVE-2019-8904]
+    * Closes: #922968 [CVE-2019-8905 CVE-2019-8907]
+    * Closes: #922969 [CVE-2019-8906]
+  * Cherry-pick two documentation fix commits
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 01 Mar 2019 09:27:11 +0100
+
+file (1:5.35-2) unstable; urgency=medium
+
+  * Upload to unstable
+  * Clarify manpage: seccomp is disabled for the time being (#917930)
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 11 Jan 2019 17:26:27 +0100
+
+file (1:5.35-1) experimental; urgency=medium
+
+  * New upstream version 5.35, upload to experimental
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sat, 03 Nov 2018 14:37:11 +0100
+
+file (1:5.34-2) unstable; urgency=medium
+
+  * Cherry-pick from upstream: Handle [elf] files without program
+    headers gracefully. Closes: #882310
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 05 Aug 2018 19:53:19 +0200
+
+file (1:5.34-1) experimental; urgency=medium
+
+  * New upstream version 5.34, upload to experimental
+  * Fixes:
+    - Detect FITS image data. Closes: #857999
+    - Don't mis-detect enigmail properties. Closes: #903318
+  * Also add preliminary magic for:
+    - AutoCAD Drawing Exchange Format. Closes: #702744
+    - Extended Display Identification Data (EDID). Closes: #896932
+    - SketchUp files. Closes: #903693
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 26 Jul 2018 07:28:30 +0200
+
+file (1:5.33-3) unstable; urgency=high
 
   * Avoid reading past the end of buffer. Closes: #901351
     [CVE-2018-10360]
 
- -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 11 Jun 2018 23:16:09 +0200
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 11 Jun 2018 22:52:24 +0200
 
-file (1:5.30-1+deb9u1) stretch-security; urgency=high
+file (1:5.33-2) unstable; urgency=medium
 
-  * Non-maintainer upload by the Security Team.
-  * CVE-2017-1000249: stack based buffer overflow via specially crafted .notes
-    section in an ELF binary
+  * Recognize ia64 and amd64 COFF files. Closes: #877643
+  * Disable erroneous DBPF detection that breaks SQLite and some
+    more. Closes: 897153
 
- -- Salvatore Bonaccorso <carnil@debian.org>  Fri, 01 Sep 2017 21:23:02 +0200
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 29 Apr 2018 12:13:32 +0200
+
+file (1:5.33-1) unstable; urgency=low
+
+  * New upstream version 5.33
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 24 Apr 2018 07:39:10 +0200
+
+file (1:5.32-2) unstable; urgency=medium
+
+  * No longer ship python-magic libraries, they are now provided
+    by src:python-magic
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 13 Feb 2018 21:43:38 +0100
+
+file (1:5.32-1) unstable; urgency=high
+
+  * New upstream version 5.32
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 04 Sep 2017 18:20:35 +0200
+
+file (1:5.31-1) unstable; urgency=medium
+
+  * New upstream version 5.31
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 06 Aug 2017 17:29:56 +0200
 
 file (1:5.30-1) unstable; urgency=high
 

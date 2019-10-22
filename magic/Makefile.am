@@ -1,5 +1,5 @@
 #
-# $File: Makefile.am,v 1.122 2016/11/09 18:20:53 christos Exp $
+# $File: Makefile.am,v 1.138 2018/10/16 12:07:08 christos Exp $
 #
 MAGIC_FRAGMENT_BASE = Magdir
 MAGIC_DIR = $(top_srcdir)/magic
@@ -21,6 +21,7 @@ $(MAGIC_FRAGMENT_DIR)/amigaos \
 $(MAGIC_FRAGMENT_DIR)/android \
 $(MAGIC_FRAGMENT_DIR)/animation \
 $(MAGIC_FRAGMENT_DIR)/aout \
+$(MAGIC_FRAGMENT_DIR)/apache \
 $(MAGIC_FRAGMENT_DIR)/apl \
 $(MAGIC_FRAGMENT_DIR)/apple \
 $(MAGIC_FRAGMENT_DIR)/application \
@@ -33,8 +34,11 @@ $(MAGIC_FRAGMENT_DIR)/att3b \
 $(MAGIC_FRAGMENT_DIR)/audio \
 $(MAGIC_FRAGMENT_DIR)/basis \
 $(MAGIC_FRAGMENT_DIR)/ber \
+$(MAGIC_FRAGMENT_DIR)/beetle \
 $(MAGIC_FRAGMENT_DIR)/bflt \
+$(MAGIC_FRAGMENT_DIR)/bhl \
 $(MAGIC_FRAGMENT_DIR)/bioinformatics \
+$(MAGIC_FRAGMENT_DIR)/biosig \
 $(MAGIC_FRAGMENT_DIR)/blackberry \
 $(MAGIC_FRAGMENT_DIR)/blcr \
 $(MAGIC_FRAGMENT_DIR)/blender \
@@ -69,6 +73,8 @@ $(MAGIC_FRAGMENT_DIR)/cubemap \
 $(MAGIC_FRAGMENT_DIR)/cups \
 $(MAGIC_FRAGMENT_DIR)/dact \
 $(MAGIC_FRAGMENT_DIR)/database \
+$(MAGIC_FRAGMENT_DIR)/dataone \
+$(MAGIC_FRAGMENT_DIR)/dbpf \
 $(MAGIC_FRAGMENT_DIR)/der \
 $(MAGIC_FRAGMENT_DIR)/diamond \
 $(MAGIC_FRAGMENT_DIR)/diff \
@@ -97,8 +103,10 @@ $(MAGIC_FRAGMENT_DIR)/fsav \
 $(MAGIC_FRAGMENT_DIR)/fusecompress \
 $(MAGIC_FRAGMENT_DIR)/games \
 $(MAGIC_FRAGMENT_DIR)/gcc \
+$(MAGIC_FRAGMENT_DIR)/gconv \
 $(MAGIC_FRAGMENT_DIR)/geo \
 $(MAGIC_FRAGMENT_DIR)/geos \
+$(MAGIC_FRAGMENT_DIR)/glibc \
 $(MAGIC_FRAGMENT_DIR)/gimp \
 $(MAGIC_FRAGMENT_DIR)/gnome \
 $(MAGIC_FRAGMENT_DIR)/gnu \
@@ -109,6 +117,7 @@ $(MAGIC_FRAGMENT_DIR)/grace \
 $(MAGIC_FRAGMENT_DIR)/graphviz \
 $(MAGIC_FRAGMENT_DIR)/gringotts \
 $(MAGIC_FRAGMENT_DIR)/guile \
+$(MAGIC_FRAGMENT_DIR)/hardware \
 $(MAGIC_FRAGMENT_DIR)/hitachi-sh \
 $(MAGIC_FRAGMENT_DIR)/hp \
 $(MAGIC_FRAGMENT_DIR)/human68k \
@@ -130,6 +139,7 @@ $(MAGIC_FRAGMENT_DIR)/karma \
 $(MAGIC_FRAGMENT_DIR)/kde \
 $(MAGIC_FRAGMENT_DIR)/keepass \
 $(MAGIC_FRAGMENT_DIR)/kerberos \
+$(MAGIC_FRAGMENT_DIR)/kicad \
 $(MAGIC_FRAGMENT_DIR)/kml \
 $(MAGIC_FRAGMENT_DIR)/lecter \
 $(MAGIC_FRAGMENT_DIR)/lex \
@@ -153,6 +163,7 @@ $(MAGIC_FRAGMENT_DIR)/mathcad \
 $(MAGIC_FRAGMENT_DIR)/mathematica \
 $(MAGIC_FRAGMENT_DIR)/matroska \
 $(MAGIC_FRAGMENT_DIR)/mcrypt \
+$(MAGIC_FRAGMENT_DIR)/measure \
 $(MAGIC_FRAGMENT_DIR)/mercurial \
 $(MAGIC_FRAGMENT_DIR)/metastore \
 $(MAGIC_FRAGMENT_DIR)/meteorological \
@@ -219,6 +230,7 @@ $(MAGIC_FRAGMENT_DIR)/python \
 $(MAGIC_FRAGMENT_DIR)/qt \
 $(MAGIC_FRAGMENT_DIR)/revision \
 $(MAGIC_FRAGMENT_DIR)/riff \
+$(MAGIC_FRAGMENT_DIR)/rpi \
 $(MAGIC_FRAGMENT_DIR)/rpm \
 $(MAGIC_FRAGMENT_DIR)/rtf \
 $(MAGIC_FRAGMENT_DIR)/ruby \
@@ -255,6 +267,7 @@ $(MAGIC_FRAGMENT_DIR)/tex \
 $(MAGIC_FRAGMENT_DIR)/tgif \
 $(MAGIC_FRAGMENT_DIR)/ti-8x \
 $(MAGIC_FRAGMENT_DIR)/timezone \
+$(MAGIC_FRAGMENT_DIR)/tplink \
 $(MAGIC_FRAGMENT_DIR)/troff \
 $(MAGIC_FRAGMENT_DIR)/tuxedo \
 $(MAGIC_FRAGMENT_DIR)/typeset \
@@ -276,6 +289,7 @@ $(MAGIC_FRAGMENT_DIR)/vorbis \
 $(MAGIC_FRAGMENT_DIR)/vxl \
 $(MAGIC_FRAGMENT_DIR)/warc \
 $(MAGIC_FRAGMENT_DIR)/weak \
+$(MAGIC_FRAGMENT_DIR)/webassembly \
 $(MAGIC_FRAGMENT_DIR)/windows \
 $(MAGIC_FRAGMENT_DIR)/wireless \
 $(MAGIC_FRAGMENT_DIR)/wordprocessors \
@@ -289,7 +303,8 @@ $(MAGIC_FRAGMENT_DIR)/xwindows \
 $(MAGIC_FRAGMENT_DIR)/yara \
 $(MAGIC_FRAGMENT_DIR)/zfs \
 $(MAGIC_FRAGMENT_DIR)/zilog \
-$(MAGIC_FRAGMENT_DIR)/zyxel 
+$(MAGIC_FRAGMENT_DIR)/zip \
+$(MAGIC_FRAGMENT_DIR)/zyxel
 
 MAGIC = magic.mgc
 CLEANFILES = ${MAGIC} $(MAGIC_FRAGMENT_DIR)/Localstuff
