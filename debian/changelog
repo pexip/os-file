@@ -1,3 +1,16 @@
+file (1:5.30-1+deb9u3pexip1) pexip; urgency=medium
+
+  * New upstream release
+
+ -- Vincent Sanders <vince@pexip.com>  Thu, 21 Nov 2019 15:43:31 +0000
+
+file (1:5.30-1+deb9u3) stretch-security; urgency=high
+
+  * Cherry-pick commit to restrict the number of CDF_VECTOR elements.
+    Closes: #942830 [CVE-2019-18218]
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 22 Oct 2019 22:20:07 +0200
+
 file (1:5.30-1+deb9u2pexip1) pexip; urgency=medium
 
   * New upstream release
