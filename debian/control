@@ -16,7 +16,7 @@ Build-Depends-Indep:
     python3-setuptools,
 Priority: standard
 Section: utils
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
 
 Package: file
 Architecture: any
