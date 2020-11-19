@@ -32,7 +32,7 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: fsmagic.c,v 1.79 2018/10/02 00:38:33 christos Exp $")
+FILE_RCSID("@(#)$File: fsmagic.c,v 1.81 2019/07/16 13:30:32 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
@@ -46,11 +46,14 @@ FILE_RCSID("@(#)$File: fsmagic.c,v 1.79 2018/10/02 00:38:33 christos Exp $")
 # include <sys/mkdev.h>
 # define HAVE_MAJOR
 #endif
-#ifdef MAJOR_IN_SYSMACROS
+#ifdef HAVE_SYS_SYSMACROS_H
 # include <sys/sysmacros.h>
+#endif
+#ifdef MAJOR_IN_SYSMACROS
 # define HAVE_MAJOR
 #endif
-#ifdef major			/* Might be defined in sys/types.h.  */
+#if defined(major) && !defined(HAVE_MAJOR)
+/* Might be defined in sys/types.h.  */
 # define HAVE_MAJOR
 #endif
 #ifdef WIN32
@@ -422,5 +425,11 @@ file_fsmagic(struct magic_set *ms, const char *fn, struct stat *sb)
 	    if (file_printf(ms, " ") == -1)
 		    return -1;
 	}
+	/*
+	 * If we were looking for extensions or apple (silent) it is not our
+	 * job to print here, so don't count this as a match.
+	 */
+	if (ret == 1 && silent)
+		return 0;
 	return ret;
 }
