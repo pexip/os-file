@@ -1,3 +1,9 @@
+file (1:5.35-4+deb10u2) buster; urgency=medium
+
+  * Change default for name/use to 50. Closes: #928009
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 25 Jan 2021 22:40:17 +0100
+
 file (1:5.35-4+deb10u1) buster-security; urgency=high
 
   * Cherry-pick commit to restrict the number of CDF_VECTOR elements.

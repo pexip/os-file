@@ -18,6 +18,8 @@ cherry-pick.FILE5_35-59-g8305d1cc.use-c-casts-everywhere.patch
 cherry-pick.FILE5_36-1-gecca6e54.fix-casts-and-bounds-check-found-by-oss-fuzz.patch
 cherry-pick.FILE5_36-24-g9b2f9d6a.cast-to-unsigned-first-to-appease-ubsan-oss-fuzz.patch
 cherry-pick.FILE5_37-67-g46a8443f.limit-the-number-of-elements-in-a-vector-found-by-oss-fuzz.patch
+# part of FILE5_38-65-gdf476c81
+increase.number.use.magic.limit.patch
 
 # patches that should go upstream
 
