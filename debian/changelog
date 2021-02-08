@@ -1,26 +1,14 @@
-file (1:5.35-4+deb10u1pexip6) pexip; urgency=medium
+file (1:5.35-4+deb10u2pexip1) pexip; urgency=medium
 
-  * Rebuild in buster environment
+  * New upstream version
 
- -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 20:31:18 +0000
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 08 Feb 2021 14:43:54 +0000
 
-file (1:5.35-4+deb10u1pexip5) pexip; urgency=medium
+file (1:5.35-4+deb10u2) buster; urgency=medium
 
-  * Rebuild in buster environment
+  * Change default for name/use to 50. Closes: #928009
 
- -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 20:30:19 +0000
-
-file (1:5.35-4+deb10u1pexip4) pexip; urgency=medium
-
-  * Rebuild in buster environment
-
- -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 20:24:23 +0000
-
-file (1:5.35-4+deb10u1pexip3) pexip; urgency=medium
-
-  * Rebuild in buster environment
-
- -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 20:23:46 +0000
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Mon, 25 Jan 2021 22:40:17 +0100
 
 file (1:5.35-4+deb10u1pexip2) pexip; urgency=medium
 
