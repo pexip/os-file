@@ -32,7 +32,7 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: is_json.c,v 1.11 2018/10/15 16:29:16 christos Exp $")
+FILE_RCSID("@(#)$File: is_json.c,v 1.15 2020/06/07 19:05:47 christos Exp $")
 #endif
 
 #include <string.h>
@@ -44,7 +44,7 @@ FILE_RCSID("@(#)$File: is_json.c,v 1.11 2018/10/15 16:29:16 christos Exp $")
 #define DPRINTF(a, b, c)	\
     printf("%s [%.2x/%c] %.20s\n", (a), *(b), *(b), (const char *)(c))
 #else
-#define DPRINTF(a, b, c)	(void)0
+#define DPRINTF(a, b, c)	do { } while (/*CONSTCOND*/0)
 #endif
 
 #define JSON_ARRAY	0
@@ -52,7 +52,8 @@ FILE_RCSID("@(#)$File: is_json.c,v 1.11 2018/10/15 16:29:16 christos Exp $")
 #define JSON_NUMBER	2
 #define JSON_OBJECT	3
 #define JSON_STRING	4
-#define JSON_MAX	5
+#define JSON_ARRAYN	5
+#define JSON_MAX	6
 
 /*
  * if JSON_COUNT != 0:
@@ -155,6 +156,7 @@ json_parse_string(const unsigned char **ucp, const unsigned char *ue)
 			}
 		case '"':
 			*ucp = uc;
+			DPRINTF("Good string: ", uc, *ucp);
 			return 1;
 		default:
 			continue;
@@ -174,6 +176,8 @@ json_parse_array(const unsigned char **ucp, const unsigned char *ue,
 
 	DPRINTF("Parse array: ", uc, *ucp);
 	while (uc < ue) {
+		if (*uc == ']')
+			goto done;
 		if (!json_parse(&uc, ue, st, lvl + 1))
 			goto out;
 		if (uc == ue)
@@ -183,7 +187,10 @@ json_parse_array(const unsigned char **ucp, const unsigned char *ue,
 			uc++;
 			continue;
 		case ']':
+		done:
+			st[JSON_ARRAYN]++;
 			*ucp = uc + 1;
+			DPRINTF("Good array: ", uc, *ucp);
 			return 1;
 		default:
 			goto out;
@@ -205,6 +212,10 @@ json_parse_object(const unsigned char **ucp, const unsigned char *ue,
 		uc = json_skip_space(uc, ue);
 		if (uc == ue)
 			goto out;
+		if (*uc == '}') {
+			uc++;
+			goto done;
+		}
 		if (*uc++ != '"') {
 			DPRINTF("not string", uc, *ucp);
 			goto out;
@@ -231,6 +242,7 @@ json_parse_object(const unsigned char **ucp, const unsigned char *ue,
 		case ',':
 			continue;
 		case '}': /* { */
+		done:
 			*ucp = uc;
 			DPRINTF("Good object: ", uc, *ucp);
 			return 1;
@@ -330,7 +342,7 @@ json_parse(const unsigned char **ucp, const unsigned char *ue,
 		return 0;
 #if JSON_COUNT
 	/* bail quickly if not counting */
-	if (lvl > 1 && (st[JSON_OBJECT] || st[JSON_ARRAY]))
+	if (lvl > 1 && (st[JSON_OBJECT] || st[JSON_ARRAYN]))
 		return 1;
 #endif
 
@@ -373,7 +385,7 @@ out:
 	*ucp = uc;
 	DPRINTF("End general: ", uc, *ucp);
 	if (lvl == 0)
-		return rv && (st[JSON_ARRAY] || st[JSON_OBJECT]);
+		return rv && (st[JSON_ARRAYN] || st[JSON_OBJECT]);
 	return rv;
 }
 
@@ -408,8 +420,10 @@ file_is_json(struct magic_set *ms, const struct buffer *b)
 #define P(n) st[n], st[n] > 1 ? "s" : ""
 	if (file_printf(ms, " (%" SIZE_T_FORMAT "u object%s, %" SIZE_T_FORMAT
 	    "u array%s, %" SIZE_T_FORMAT "u string%s, %" SIZE_T_FORMAT
-	    "u constant%s, %" SIZE_T_FORMAT "u number%s)", P(JSON_OBJECT),
-	    P(JSON_ARRAY), P(JSON_STRING), P(JSON_CONSTANT), P(JSON_NUMBER))
+	    "u constant%s, %" SIZE_T_FORMAT "u number%s, %" SIZE_T_FORMAT
+	    "u >1array%s)",
+	    P(JSON_OBJECT), P(JSON_ARRAY), P(JSON_STRING), P(JSON_CONSTANT),
+	    P(JSON_NUMBER), P(JSON_ARRAYN))
 	    == -1)
 		return -1;
 #endif
