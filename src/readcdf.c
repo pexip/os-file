@@ -26,7 +26,7 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: readcdf.c,v 1.71 2018/10/15 16:29:16 christos Exp $")
+FILE_RCSID("@(#)$File: readcdf.c,v 1.74 2019/09/11 15:46:30 christos Exp $")
 #endif
 
 #include <assert.h>
@@ -38,10 +38,6 @@ FILE_RCSID("@(#)$File: readcdf.c,v 1.71 2018/10/15 16:29:16 christos Exp $")
 
 #include "cdf.h"
 #include "magic.h"
-
-#ifndef __arraycount
-#define __arraycount(a) (sizeof(a) / sizeof(a[0]))
-#endif
 
 #define NOTMIME(ms) (((ms)->flags & MAGIC_MIME) == 0)
 
@@ -124,7 +120,11 @@ cdf_app_to_mime(const char *vbuf, const struct nv *nv)
 	old_lc_ctype = uselocale(c_lc_ctype);
 	assert(old_lc_ctype != NULL);
 #else
-	char *old_lc_ctype = setlocale(LC_CTYPE, "C");
+	char *old_lc_ctype = setlocale(LC_CTYPE, NULL);
+	assert(old_lc_ctype != NULL);
+	old_lc_ctype = strdup(old_lc_ctype);
+	assert(old_lc_ctype != NULL);
+	(void)setlocale(LC_CTYPE, "C");
 #endif
 	for (i = 0; nv[i].pattern != NULL; i++)
 		if (strcasestr(vbuf, nv[i].pattern) != NULL) {
@@ -138,7 +138,8 @@ cdf_app_to_mime(const char *vbuf, const struct nv *nv)
 	(void)uselocale(old_lc_ctype);
 	freelocale(c_lc_ctype);
 #else
-	setlocale(LC_CTYPE, old_lc_ctype);
+	(void)setlocale(LC_CTYPE, old_lc_ctype);
+	free(old_lc_ctype);
 #endif
 	return rv;
 }
@@ -204,7 +205,7 @@ cdf_file_property_info(struct magic_set *ms, const cdf_property_info_t *info,
 				    && len--; s += k) {
 					if (*s == '\0')
 						break;
-					if (isprint((unsigned char)*s))
+					if (isprint(CAST(unsigned char, *s)))
 						vbuf[j++] = *s;
 				}
 				if (j == sizeof(vbuf))
@@ -318,19 +319,19 @@ cdf_file_summary_info(struct magic_set *ms, const cdf_header_t *h,
 		case 2:
 			if (file_printf(ms, ", Os: Windows, Version %d.%d",
 			    si.si_os_version & 0xff,
-			    (uint32_t)si.si_os_version >> 8) == -1)
+			    CAST(uint32_t, si.si_os_version) >> 8) == -1)
 				return -2;
 			break;
 		case 1:
 			if (file_printf(ms, ", Os: MacOS, Version %d.%d",
-			    (uint32_t)si.si_os_version >> 8,
+			    CAST(uint32_t, si.si_os_version) >> 8,
 			    si.si_os_version & 0xff) == -1)
 				return -2;
 			break;
 		default:
 			if (file_printf(ms, ", Os %d, Version: %d.%d", si.si_os,
 			    si.si_os_version & 0xff,
-			    (uint32_t)si.si_os_version >> 8) == -1)
+			    CAST(uint32_t, si.si_os_version) >> 8) == -1)
 				return -2;
 			break;
 		}
@@ -406,7 +407,7 @@ cdf_check_summary_info(struct magic_set *ms, const cdf_info_t *info,
 	for (j = 0; str == NULL && j < dir->dir_len; j++) {
 		d = &dir->dir_tab[j];
 		for (k = 0; k < sizeof(name); k++)
-			name[k] = (char)cdf_tole2(d->d_name[k]);
+			name[k] = CAST(char, cdf_tole2(d->d_name[k]));
 		str = cdf_app_to_mime(name,
 				      NOTMIME(ms) ? name2desc : name2mime);
 	}

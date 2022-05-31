@@ -2,12 +2,16 @@ Source: file
 Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Christoph Biedl <debian.axhn@manchmal.in-ulm.de>
 Homepage: https://www.darwinsys.com/file/
-Standards-Version: 4.1.5
+Standards-Version: 4.4.1
 Vcs-Browser: https://git.in-ulm.de/cbiedl/file
 Vcs-Git: https://git.in-ulm.de/cbiedl/file.git
-Build-Depends: debhelper (>= 11~),
+Testsuite: autopkgtest
+Build-Depends: debhelper-compat (= 12),
+    libbz2-dev,
+    liblzma-dev,
     zlib1g-dev,
 Priority: standard
+Rules-Requires-Root: no
 Section: utils
 XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
 
@@ -15,6 +19,8 @@ Package: file
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends},
     libmagic1 (= ${binary:Version}),
+Breaks:
+    debhelper (<< 12.2~),
 Multi-Arch: foreign
 Description: Recognize the type of data in a file using "magic" numbers
  The file command is "a file type guesser", a command-line tool that
