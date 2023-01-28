@@ -27,15 +27,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
+#include <errno.h>
+
 #include "magic.h"
+
+static const char *prog;
 
 static void *
 xrealloc(void *p, size_t n)
 {
 	p = realloc(p, n);
 	if (p == NULL) {
-		(void)fprintf(stderr, "ERROR slurping file: out of memory\n");
+		(void)fprintf(stderr, "%s ERROR slurping file: %s\n",
+			prog, strerror(errno));
 		exit(10);
 	}
 	return p;
@@ -46,70 +52,107 @@ slurp(FILE *fp, size_t *final_len)
 {
 	size_t len = 256;
 	int c;
-	char *l = (char *)xrealloc(NULL, len), *s = l;
+	char *l = xrealloc(NULL, len), *s = l;
 
 	for (c = getc(fp); c != EOF; c = getc(fp)) {
 		if (s == l + len) {
-			l = (char *)xrealloc(l, len * 2);
+			s = l + len;
 			len *= 2;
+			l = xrealloc(l, len);
 		}
 		*s++ = c;
 	}
-	if (s == l + len)
-		l = (char *)xrealloc(l, len + 1);
+	if (s != l && s[-1] == '\n')
+		s--;
+	if (s == l + len) {
+		l = xrealloc(l, len + 1);
+		s = l + len;
+	}
 	*s++ = '\0';
 
 	*final_len = s - l;
-	l = (char *)xrealloc(l, s - l);
-	return l;
+	return xrealloc(l, s - l);
 }
 
 int
 main(int argc, char **argv)
 {
-	struct magic_set *ms;
+	struct magic_set *ms = NULL;
 	const char *result;
-	char *desired;
-	size_t desired_len;
-	int i;
+	size_t result_len, desired_len;
+	char *desired = NULL;
+	int e = EXIT_FAILURE, flags, c;
 	FILE *fp;
 
-	ms = magic_open(MAGIC_NONE);
+
+	prog = strrchr(argv[0], '/');
+	if (prog)
+		prog++;
+	else
+		prog = argv[0];
+
+	if (argc == 1)
+		return 0;
+
+	flags = 0;
+	while ((c = getopt(argc, argv, "ek")) != -1)
+		switch (c) {
+		case 'e':
+			flags |= MAGIC_ERROR;
+			break;
+		case 'k':
+			flags |= MAGIC_CONTINUE;
+			break;
+		default:
+			goto usage;
+		}
+
+	argc -= optind;
+	argv += optind;
+	if (argc != 2) {
+usage:
+		(void)fprintf(stderr,
+		    "Usage: %s [-ek] TEST-FILE RESULT\n", prog);
+		goto bad;
+	}
+
+	ms = magic_open(flags);
 	if (ms == NULL) {
-		(void)fprintf(stderr, "ERROR opening MAGIC_NONE: out of memory\n");
-		return 10;
+		(void)fprintf(stderr, "%s: ERROR opening MAGIC_NONE: %s\n",
+		    prog, strerror(errno));
+		return e;
 	}
 	if (magic_load(ms, NULL) == -1) {
-		(void)fprintf(stderr, "ERROR loading with NULL file: %s\n",
-		    magic_error(ms));
-		return 11;
+		(void)fprintf(stderr, "%s: ERROR loading with NULL file: %s\n",
+		    prog, magic_error(ms));
+		goto bad;
 	}
 
-	if (argc > 1) {
-		if (argc != 3) {
-			(void)fprintf(stderr, "Usage: test TEST-FILE RESULT\n");
-		} else {
-			if ((result = magic_file(ms, argv[1])) == NULL) {
-				(void)fprintf(stderr, "ERROR loading file %s: %s\n", argv[1], magic_error(ms));
-				return 12;
-			} else {
-				fp = fopen(argv[2], "r");
-				if (fp == NULL) {
-					(void)fprintf(stderr, "ERROR opening `%s': ", argv[2]);
-					perror(NULL);
-					return 13;
-				}
-				desired = slurp(fp, &desired_len);
-				fclose(fp);
-				(void)printf("%s: %s\n", argv[1], result);
-				if (strcmp(result, desired) != 0) {
-					(void)fprintf(stderr, "Error: result was\n%s\nexpected:\n%s\n", result, desired);
-					return 1;
-				}
-			}
-		}
+	if ((result = magic_file(ms, argv[0])) == NULL) {
+		(void)fprintf(stderr, "%s: ERROR loading file %s: %s\n",
+		    prog, argv[1], magic_error(ms));
+		goto bad;
 	}
-
-	magic_close(ms);
-	return 0;
+	fp = fopen(argv[1], "r");
+	if (fp == NULL) {
+		(void)fprintf(stderr, "%s: ERROR opening `%s': %s",
+		    prog, argv[1], strerror(errno));
+		goto bad;
+	}
+	desired = slurp(fp, &desired_len);
+	fclose(fp);
+	(void)printf("%s: %s\n", argv[0], result);
+	if (strcmp(result, desired) != 0) {
+	    result_len = strlen(result);
+	    (void)fprintf(stderr, "%s: ERROR: result was (len %zu)\n%s\n"
+		"expected (len %zu)\n%s\n", prog, result_len, result,
+		desired_len, desired);
+	    goto bad;
+	}
+	e = 0;
+bad:
+	free(desired);
+	if (ms)
+		magic_close(ms);
+	return e;
 }

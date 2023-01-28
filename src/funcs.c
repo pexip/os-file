@@ -27,7 +27,7 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: funcs.c,v 1.115 2020/02/20 15:50:20 christos Exp $")
+FILE_RCSID("@(#)$File: funcs.c,v 1.136 2022/12/26 17:31:14 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
@@ -36,6 +36,9 @@ FILE_RCSID("@(#)$File: funcs.c,v 1.115 2020/02/20 15:50:20 christos Exp $")
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>	/* for pipe2() */
+#endif
 #if defined(HAVE_WCHAR_H)
 #include <wchar.h>
 #endif
@@ -48,16 +51,19 @@ FILE_RCSID("@(#)$File: funcs.c,v 1.115 2020/02/20 15:50:20 christos Exp $")
 #define SIZE_MAX	((size_t)~0)
 #endif
 
-protected char *
+file_protected char *
 file_copystr(char *buf, size_t blen, size_t width, const char *str)
 {
-	if (++width > blen)
-		width = blen;
-	strlcpy(buf, str, width);
+	if (blen == 0)
+		return buf;
+	if (width >= blen)
+		width = blen - 1;
+	memcpy(buf, str, width);
+	buf[width] = '\0';
 	return buf;
 }
 
-private void
+file_private void
 file_clearbuf(struct magic_set *ms)
 {
 	free(ms->o.buf);
@@ -65,7 +71,7 @@ file_clearbuf(struct magic_set *ms)
 	ms->o.blen = 0;
 }
 
-private int
+file_private int
 file_checkfield(char *msg, size_t mlen, const char *what, const char **pp)
 {
 	const char *p = *pp;
@@ -84,16 +90,17 @@ file_checkfield(char *msg, size_t mlen, const char *what, const char **pp)
 	return 0;
 }
 
-protected int
+file_protected int
 file_checkfmt(char *msg, size_t mlen, const char *fmt)
 {
-	for (const char *p = fmt; *p; p++) {
+	const char *p;
+	for (p = fmt; *p; p++) {
 		if (*p != '%')
 			continue;
 		if (*++p == '%')
 			continue;
 		// Skip uninteresting.
-		while (strchr("0.'+- ", *p) != NULL)
+		while (strchr("#0.'+- ", *p) != NULL)
 			p++;
 		if (*p == '*') {
 			if (msg)
@@ -122,7 +129,7 @@ file_checkfmt(char *msg, size_t mlen, const char *fmt)
 /*
  * Like printf, only we append to a buffer.
  */
-protected int
+file_protected int
 file_vprintf(struct magic_set *ms, const char *fmt, va_list ap)
 {
 	int len;
@@ -143,8 +150,8 @@ file_vprintf(struct magic_set *ms, const char *fmt, va_list ap)
 		size_t blen = ms->o.blen;
 		free(buf);
 		file_clearbuf(ms);
-		file_error(ms, 0, "Output buffer space exceeded %d+%zu", len,
-		    blen);
+		file_error(ms, 0, "Output buffer space exceeded %d+%"
+		    SIZE_T_FORMAT "u", len, blen);
 		return -1;
 	}
 
@@ -165,7 +172,7 @@ out:
 	return -1;
 }
 
-protected int
+file_protected int
 file_printf(struct magic_set *ms, const char *fmt, ...)
 {
 	int rv;
@@ -182,7 +189,7 @@ file_printf(struct magic_set *ms, const char *fmt, ...)
  */
 /*VARARGS*/
 __attribute__((__format__(__printf__, 3, 0)))
-private void
+file_private void
 file_error_core(struct magic_set *ms, int error, const char *f, va_list va,
     size_t lineno)
 {
@@ -203,7 +210,7 @@ file_error_core(struct magic_set *ms, int error, const char *f, va_list va,
 }
 
 /*VARARGS*/
-protected void
+file_protected void
 file_error(struct magic_set *ms, int error, const char *f, ...)
 {
 	va_list va;
@@ -216,7 +223,7 @@ file_error(struct magic_set *ms, int error, const char *f, ...)
  * Print an error with magic line number.
  */
 /*VARARGS*/
-protected void
+file_protected void
 file_magerror(struct magic_set *ms, const char *f, ...)
 {
 	va_list va;
@@ -225,31 +232,51 @@ file_magerror(struct magic_set *ms, const char *f, ...)
 	va_end(va);
 }
 
-protected void
+file_protected void
 file_oomem(struct magic_set *ms, size_t len)
 {
 	file_error(ms, errno, "cannot allocate %" SIZE_T_FORMAT "u bytes",
 	    len);
 }
 
-protected void
+file_protected void
 file_badseek(struct magic_set *ms)
 {
 	file_error(ms, errno, "error seeking");
 }
 
-protected void
+file_protected void
 file_badread(struct magic_set *ms)
 {
 	file_error(ms, errno, "error reading");
 }
 
 #ifndef COMPILE_ONLY
+#define FILE_SEPARATOR "\n- "
 
-protected int
+file_protected int
 file_separator(struct magic_set *ms)
 {
-	return file_printf(ms, "\n- ");
+	return file_printf(ms, FILE_SEPARATOR);
+}
+
+static void
+trim_separator(struct magic_set *ms)
+{
+	size_t l;
+
+	if (ms->o.buf == NULL)
+		return;
+
+	l = strlen(ms->o.buf);
+	if (l < sizeof(FILE_SEPARATOR))
+		return;
+
+	l -= sizeof(FILE_SEPARATOR) - 1;
+	if (strcmp(ms->o.buf + l, FILE_SEPARATOR) != 0)
+		return;
+
+	ms->o.buf[l] = '\0';
 }
 
 static int
@@ -262,7 +289,7 @@ checkdone(struct magic_set *ms, int *rv)
 	return 0;
 }
 
-protected int
+file_protected int
 file_default(struct magic_set *ms, size_t nb)
 {
 	if (ms->flags & MAGIC_MIME) {
@@ -292,7 +319,7 @@ file_default(struct magic_set *ms, size_t nb)
  *	-1: error
  */
 /*ARGSUSED*/
-protected int
+file_protected int
 file_buffer(struct magic_set *ms, int fd, struct stat *st,
     const char *inname __attribute__ ((__unused__)),
     const void *buf, size_t nb)
@@ -453,6 +480,7 @@ simple:
 				rv = -1;
 	}
  done:
+	trim_separator(ms);
 	if ((ms->flags & MAGIC_MIME_ENCODING) != 0) {
 		if (ms->flags & MAGIC_MIME_TYPE)
 			if (file_printf(ms, "; charset=") == -1)
@@ -472,7 +500,7 @@ simple:
 }
 #endif
 
-protected int
+file_protected int
 file_reset(struct magic_set *ms, int checkloaded)
 {
 	if (checkloaded && ms->mlist[0] == NULL) {
@@ -497,7 +525,7 @@ file_reset(struct magic_set *ms, int checkloaded)
 	*(n)++ = ((CAST(uint32_t, *(o)) >> 0) & 7) + '0', \
 	(o)++)
 
-protected const char *
+file_protected const char *
 file_getbuffer(struct magic_set *ms)
 {
 	char *pbuf, *op, *np;
@@ -575,7 +603,7 @@ file_getbuffer(struct magic_set *ms)
 	return ms->o.pbuf;
 }
 
-protected int
+file_protected int
 file_check_mem(struct magic_set *ms, unsigned int level)
 {
 	size_t len;
@@ -598,25 +626,23 @@ file_check_mem(struct magic_set *ms, unsigned int level)
 	return 0;
 }
 
-protected size_t
+file_protected size_t
 file_printedlen(const struct magic_set *ms)
 {
 	return ms->o.blen;
 }
 
-protected int
+file_protected int
 file_replace(struct magic_set *ms, const char *pat, const char *rep)
 {
 	file_regex_t rx;
 	int rc, rv = -1;
 
-	rc = file_regcomp(&rx, pat, REG_EXTENDED);
-	if (rc) {
-		file_regerror(&rx, rc, ms);
-	} else {
+	rc = file_regcomp(ms, &rx, pat, REG_EXTENDED);
+	if (rc == 0) {
 		regmatch_t rm;
 		int nm = 0;
-		while (file_regexec(&rx, ms->o.buf, 1, &rm, 0) == 0) {
+		while (file_regexec(ms, &rx, ms->o.buf, 1, &rm, 0) == 0) {
 			ms->o.buf[rm.rm_so] = '\0';
 			if (file_printf(ms, "%s%s", rep,
 			    rm.rm_eo != 0 ? ms->o.buf + rm.rm_eo : "") == -1)
@@ -630,62 +656,103 @@ out:
 	return rv;
 }
 
-protected int
-file_regcomp(file_regex_t *rx, const char *pat, int flags)
+file_private int
+check_regex(struct magic_set *ms, const char *pat)
 {
-#ifdef USE_C_LOCALE
-	rx->c_lc_ctype = newlocale(LC_CTYPE_MASK, "C", 0);
-	assert(rx->c_lc_ctype != NULL);
-	rx->old_lc_ctype = uselocale(rx->c_lc_ctype);
-	assert(rx->old_lc_ctype != NULL);
-#else
-	rx->old_lc_ctype = setlocale(LC_CTYPE, NULL);
-	assert(rx->old_lc_ctype != NULL);
-	rx->old_lc_ctype = strdup(rx->old_lc_ctype);
-	assert(rx->old_lc_ctype != NULL);
-	(void)setlocale(LC_CTYPE, "C");
-#endif
-	rx->pat = pat;
+	char sbuf[512];
+	unsigned char oc = '\0';
 
-	return rx->rc = regcomp(&rx->rx, pat, flags);
+	for (const char *p = pat; *p; p++) {
+		unsigned char c = *p;
+		// Avoid repetition
+		if (c == oc && strchr("?*+{", c) != NULL) {
+			size_t len = strlen(pat);
+			file_magwarn(ms,
+			    "repetition-operator operand `%c' "
+			    "invalid in regex `%s'", c,
+			    file_printable(ms, sbuf, sizeof(sbuf), pat, len));
+			return -1;
+		}
+		oc = c;
+		if (isprint(c) || isspace(c) || c == '\b'
+		    || c == 0x8a) // XXX: apple magic fixme
+			continue;
+		size_t len = strlen(pat);
+		file_magwarn(ms,
+		    "non-ascii characters in regex \\%#o `%s'",
+		    c, file_printable(ms, sbuf, sizeof(sbuf), pat, len));
+		return -1;
+	}
+	return 0;
 }
 
-protected int
-file_regexec(file_regex_t *rx, const char *str, size_t nmatch,
-    regmatch_t* pmatch, int eflags)
+file_protected int
+file_regcomp(struct magic_set *ms file_locale_used, file_regex_t *rx,
+    const char *pat, int flags)
 {
-	assert(rx->rc == 0);
+	if (check_regex(ms, pat) == -1)
+		return -1;
+
+#ifdef USE_C_LOCALE
+	locale_t old = uselocale(ms->c_lc_ctype);
+	assert(old != NULL);
+#else
+	char old[1024];
+	strlcpy(old, setlocale(LC_CTYPE, NULL), sizeof(old));
+	(void)setlocale(LC_CTYPE, "C");
+#endif
+	int rc;
+	rc = regcomp(rx, pat, flags);
+
+#ifdef USE_C_LOCALE
+	uselocale(old);
+#else
+	(void)setlocale(LC_CTYPE, old);
+#endif
+	if (rc > 0 && (ms->flags & MAGIC_CHECK)) {
+		char errmsg[512], buf[512];
+
+		(void)regerror(rc, rx, errmsg, sizeof(errmsg));
+		file_magerror(ms, "regex error %d for `%s', (%s)", rc, 
+		    file_printable(ms, buf, sizeof(buf), pat, strlen(pat)),
+		    errmsg);
+	}
+	return rc;
+}
+
+/*ARGSUSED*/
+file_protected int
+file_regexec(struct magic_set *ms file_locale_used, file_regex_t *rx,
+    const char *str, size_t nmatch, regmatch_t* pmatch, int eflags)
+{
+#ifdef USE_C_LOCALE
+	locale_t old = uselocale(ms->c_lc_ctype);
+	assert(old != NULL);
+#else
+	char old[1024];
+	strlcpy(old, setlocale(LC_CTYPE, NULL), sizeof(old));
+	(void)setlocale(LC_CTYPE, "C");
+#endif
+	int rc;
 	/* XXX: force initialization because glibc does not always do this */
 	if (nmatch != 0)
 		memset(pmatch, 0, nmatch * sizeof(*pmatch));
-	return regexec(&rx->rx, str, nmatch, pmatch, eflags);
+	rc = regexec(rx, str, nmatch, pmatch, eflags);
+#ifdef USE_C_LOCALE
+	uselocale(old);
+#else
+	(void)setlocale(LC_CTYPE, old);
+#endif
+	return rc;
 }
 
-protected void
+file_protected void
 file_regfree(file_regex_t *rx)
 {
-	if (rx->rc == 0)
-		regfree(&rx->rx);
-#ifdef USE_C_LOCALE
-	(void)uselocale(rx->old_lc_ctype);
-	freelocale(rx->c_lc_ctype);
-#else
-	(void)setlocale(LC_CTYPE, rx->old_lc_ctype);
-	free(rx->old_lc_ctype);
-#endif
+	regfree(rx);
 }
 
-protected void
-file_regerror(file_regex_t *rx, int rc, struct magic_set *ms)
-{
-	char errmsg[512];
-
-	(void)regerror(rc, &rx->rx, errmsg, sizeof(errmsg));
-	file_magerror(ms, "regex error %d for `%s', (%s)", rc, rx->pat,
-	    errmsg);
-}
-
-protected file_pushbuf_t *
+file_protected file_pushbuf_t *
 file_push_buffer(struct magic_set *ms)
 {
 	file_pushbuf_t *pb;
@@ -707,7 +774,7 @@ file_push_buffer(struct magic_set *ms)
 	return pb;
 }
 
-protected char *
+file_protected char *
 file_pop_buffer(struct magic_set *ms, file_pushbuf_t *pb)
 {
 	char *rbuf;
@@ -731,15 +798,16 @@ file_pop_buffer(struct magic_set *ms, file_pushbuf_t *pb)
 /*
  * convert string to ascii printable format.
  */
-protected char *
-file_printable(char *buf, size_t bufsiz, const char *str, size_t slen)
+file_protected char *
+file_printable(struct magic_set *ms, char *buf, size_t bufsiz,
+    const char *str, size_t slen)
 {
 	char *ptr, *eptr = buf + bufsiz - 1;
 	const unsigned char *s = RCAST(const unsigned char *, str);
 	const unsigned char *es = s + slen;
 
 	for (ptr = buf;  ptr < eptr && s < es && *s; s++) {
-		if (isprint(*s)) {
+		if ((ms->flags & MAGIC_RAW) != 0 || isprint(*s)) {
 			*ptr++ = *s;
 			continue;
 		}
@@ -761,25 +829,90 @@ struct guid {
 	uint8_t data4[8];
 };
 
-protected int
+file_protected int
 file_parse_guid(const char *s, uint64_t *guid)
 {
-	struct guid *g = CAST(struct guid *, guid);
+	struct guid *g = CAST(struct guid *, CAST(void *, guid));
+#ifndef WIN32
 	return sscanf(s,
 	    "%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx",
 	    &g->data1, &g->data2, &g->data3, &g->data4[0], &g->data4[1],
 	    &g->data4[2], &g->data4[3], &g->data4[4], &g->data4[5],
 	    &g->data4[6], &g->data4[7]) == 11 ? 0 : -1;
+#else
+	/* MS-Windows runtime doesn't support %hhx, except under
+	   non-default __USE_MINGW_ANSI_STDIO.  */
+	uint16_t data16[8];
+	int rv = sscanf(s, "%8x-%4hx-%4hx-%2hx%2hx-%2hx%2hx%2hx%2hx%2hx%2hx",
+	    &g->data1, &g->data2, &g->data3, &data16[0], &data16[1],
+	    &data16[2], &data16[3], &data16[4], &data16[5],
+	    &data16[6], &data16[7]) == 11 ? 0 : -1;
+	int i;
+	for (i = 0; i < 8; i++)
+	    g->data4[i] = data16[i];
+	return rv;
+#endif
 }
 
-protected int
+file_protected int
 file_print_guid(char *str, size_t len, const uint64_t *guid)
 {
-	const struct guid *g = CAST(const struct guid *, guid);
+	const struct guid *g = CAST(const struct guid *,
+	    CAST(const void *, guid));
 
+#ifndef WIN32
 	return snprintf(str, len, "%.8X-%.4hX-%.4hX-%.2hhX%.2hhX-"
 	    "%.2hhX%.2hhX%.2hhX%.2hhX%.2hhX%.2hhX",
 	    g->data1, g->data2, g->data3, g->data4[0], g->data4[1],
 	    g->data4[2], g->data4[3], g->data4[4], g->data4[5],
 	    g->data4[6], g->data4[7]);
+#else
+	return snprintf(str, len, "%.8X-%.4hX-%.4hX-%.2hX%.2hX-"
+	    "%.2hX%.2hX%.2hX%.2hX%.2hX%.2hX",
+	    g->data1, g->data2, g->data3, g->data4[0], g->data4[1],
+	    g->data4[2], g->data4[3], g->data4[4], g->data4[5],
+	    g->data4[6], g->data4[7]);
+#endif
+}
+
+file_protected int
+file_pipe_closexec(int *fds)
+{
+#ifdef HAVE_PIPE2
+	return pipe2(fds, O_CLOEXEC);
+#else
+	if (pipe(fds) == -1)
+		return -1;
+# ifdef F_SETFD
+	(void)fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+	(void)fcntl(fds[1], F_SETFD, FD_CLOEXEC);
+# endif
+	return 0;
+#endif
+}
+
+file_protected int
+file_clear_closexec(int fd) {
+#ifdef F_SETFD
+	return fcntl(fd, F_SETFD, 0);
+#else
+	return 0;
+#endif
+}
+
+file_protected char *
+file_strtrim(char *str)
+{
+	char *last;
+
+	while (isspace(CAST(unsigned char, *str)))
+		str++;
+	last = str;
+	while (*last)
+		last++;
+	--last;
+	while (isspace(CAST(unsigned char, *last)))
+		last--;
+	*++last = '\0';
+	return str;
 }

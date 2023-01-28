@@ -1,9 +1,69 @@
-file (1:5.39-3+deb11u1) bullseye-security; urgency=high
+file (1:5.44-3) unstable; urgency=medium
 
-  * Non-maintainer upload by the Security Team.
-  * stack-based buffer over-read in file_copystr in funcs.c (CVE-2022-48554)
+  * Cherry-pick fixes related to APK file detection
 
- -- Salvatore Bonaccorso <carnil@debian.org>  Wed, 30 Aug 2023 20:51:00 +0200
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sat, 28 Jan 2023 19:17:20 +0100
+
+file (1:5.44-2) unstable; urgency=medium
+
+  * Cherry-pick several commits to improve the detection of APK files.
+    Closes: #849782
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 15 Jan 2023 19:15:20 +0100
+
+file (1:5.44-1) unstable; urgency=medium
+
+  * New upstream version 5.44
+  * Cherry-pick "Pyzip improvements". Closes: #1026976
+  * Detect smali files
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 10 Jan 2023 21:39:37 +0100
+
+file (1:5.43-3) experimental; urgency=medium
+
+  * Refine autopkgtest
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 22 Dec 2022 21:39:48 +0100
+
+file (1:5.43-2) experimental; urgency=medium
+
+  * Upload to experimental
+  * Include all upstream commits since the 5.43 release.
+    Closes: #1024639, #1026460
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Wed, 21 Dec 2022 22:10:41 +0100
+
+file (1:5.43-1) experimental; urgency=medium
+
+  * Upload to experimental
+  * New upstream version 5.43. Closes: #922874, #1012426
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Tue, 11 Oct 2022 21:41:11 +0200
+
+file (1:5.41-4) unstable; urgency=medium
+
+  * Use the just-built file executable only if it exists
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 24 Apr 2022 12:49:37 +0200
+
+file (1:5.41-3) unstable; urgency=medium
+
+  * Cherry-pick commit to avoid mis-detection of .dbf as executable
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 24 Mar 2022 18:07:09 +0100
+
+file (1:5.41-2) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 19 Nov 2021 19:16:34 +0100
+
+file (1:5.41-1) experimental; urgency=medium
+
+  * Upload to experimental
+  * New upstream version 5.41. Closes: #810501
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 29 Oct 2021 19:10:37 +0200
 
 file (1:5.39-3) unstable; urgency=medium
 
