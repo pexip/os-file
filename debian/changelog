@@ -1,3 +1,16 @@
+file (1:5.39-3+deb11u1pexip1) pexip; urgency=high
+
+  * New upstream release with security fix
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Fri, 09 Sep 2023 15:02:20 +0100
+
+file (1:5.39-3+deb11u1) bullseye-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * stack-based buffer over-read in file_copystr in funcs.c (CVE-2022-48554)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Wed, 30 Aug 2023 20:51:00 +0200
+
 file (1:5.39-3pexip3) pexip-bullseye; urgency=medium
 
   * Bullseye rebuild for ARM64 inclusion
