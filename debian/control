@@ -13,7 +13,7 @@ Build-Depends: debhelper-compat (= 12),
 Priority: standard
 Rules-Requires-Root: no
 Section: utils
-XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
+XS-Pexip-Upstream: http://deb.debian.org/debian/ bookworm
 
 Package: file
 Architecture: any
