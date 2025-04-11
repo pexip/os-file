@@ -1,0 +1,19 @@
+Subject: Use unsigned byte (Christoph Biedl)
+Origin: upstream, commit FILE5_46-55-gff9ba253 <https://github.com/file/file/commit/FILE5_46-55-gff9ba253>
+Author: Christos Zoulas <christos@zoulas.com>
+Date: Mon Mar 3 17:02:02 2025 +0000
+
+--- a/magic/Magdir/msdos
++++ b/magic/Magdir/msdos
+@@ -2108,9 +2108,9 @@
+ #	display shared information of cursor or icon entry
+ 0		name		cur-ico-entry
+ >0		byte		=0		\b, 256x
+->0		byte		!0		\b, %dx
++>0		ubyte		!0		\b, %dx
+ >1		byte        	=0		\b256
+->1		byte        	!0		\b%d
++>1		ubyte        	!0		\b%d
+ # number of colors in palette
+ >2		ubyte		!0		\b, %d colors
+ # reserved 0 FFh

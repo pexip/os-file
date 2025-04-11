@@ -1,0 +1,17 @@
+Subject: PR/579: net147: Fix stack overrun.
+Origin: upstream, commit FILE5_46-7-gb3384a1f <https://github.com/file/file/commit/FILE5_46-7-gb3384a1f>
+Author: Christos Zoulas <christos@zoulas.com>
+Date: Thu Dec 5 18:35:40 2024 +0000
+Bug-Debian: https://bugs.debian.org/1101470
+
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -1726,7 +1726,7 @@
+ 	Elf64_Phdr ph64;
+ 	const char *linking_style;
+ 	unsigned char nbuf[NBUFSIZE];
+-	char interp[128];
++	char interp[NBUFSIZE];
+ 	ssize_t bufsize;
+ 	size_t offset, align, need = 0;
+ 	int pie = 0, dynamic = 0;

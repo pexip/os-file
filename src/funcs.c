@@ -27,7 +27,7 @@
 #include "file.h"
 
 #ifndef	lint
-FILE_RCSID("@(#)$File: funcs.c,v 1.136 2022/12/26 17:31:14 christos Exp $")
+FILE_RCSID("@(#)$File: funcs.c,v 1.142 2023/07/30 14:41:14 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
@@ -398,9 +398,20 @@ file_buffer(struct magic_set *ms, int fd, struct stat *st,
 
 	/* Check if we have a CSV file */
 	if ((ms->flags & MAGIC_NO_CHECK_CSV) == 0) {
-		m = file_is_csv(ms, &b, looks_text);
+		m = file_is_csv(ms, &b, looks_text, code);
 		if ((ms->flags & MAGIC_DEBUG) != 0)
 			(void)fprintf(stderr, "[try csv %d]\n", m);
+		if (m) {
+			if (checkdone(ms, &rv))
+				goto done;
+		}
+	}
+
+	/* Check if we have a SIMH tape file */
+	if ((ms->flags & MAGIC_NO_CHECK_SIMH) == 0) {
+		m = file_is_simh(ms, &b);
+		if ((ms->flags & MAGIC_DEBUG) != 0)
+			(void)fprintf(stderr, "[try simh %d]\n", m);
 		if (m) {
 			if (checkdone(ms, &rv))
 				goto done;
@@ -661,8 +672,10 @@ check_regex(struct magic_set *ms, const char *pat)
 {
 	char sbuf[512];
 	unsigned char oc = '\0';
+	const char *p;
+	unsigned long l;
 
-	for (const char *p = pat; *p; p++) {
+	for (p = pat; *p; p++) {
 		unsigned char c = *p;
 		// Avoid repetition
 		if (c == oc && strchr("?*+{", c) != NULL) {
@@ -672,6 +685,19 @@ check_regex(struct magic_set *ms, const char *pat)
 			    "invalid in regex `%s'", c,
 			    file_printable(ms, sbuf, sizeof(sbuf), pat, len));
 			return -1;
+		}
+		if (c == '{') {
+			char *ep, *eep;
+			errno = 0;
+			l = strtoul(p + 1, &ep, 10);
+			if (ep != p + 1 && l > 1000)
+				goto bounds;
+
+			if (*ep == ',') {
+				l = strtoul(ep + 1, &eep, 10);
+				if (eep != ep + 1 && l > 1000)
+					goto bounds;
+			}
 		}
 		oc = c;
 		if (isprint(c) || isspace(c) || c == '\b'
@@ -684,6 +710,9 @@ check_regex(struct magic_set *ms, const char *pat)
 		return -1;
 	}
 	return 0;
+bounds:
+	file_magwarn(ms, "bounds too large %ld in regex `%s'", l, pat);
+	return -1;
 }
 
 file_protected int
@@ -878,7 +907,9 @@ file_print_guid(char *str, size_t len, const uint64_t *guid)
 file_protected int
 file_pipe_closexec(int *fds)
 {
-#ifdef HAVE_PIPE2
+#ifdef __MINGW32__
+	return 0;
+#elif defined(HAVE_PIPE2)
 	return pipe2(fds, O_CLOEXEC);
 #else
 	if (pipe(fds) == -1)

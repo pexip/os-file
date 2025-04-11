@@ -1,0 +1,17 @@
+Description: Stricter PostScript magic
+Author: Vincent Lefevre <vincent@vinc17.net>
+Bug: https://bugs.astron.com/view.php?id=618
+Bug-Debian: https://bugs.debian.org/988451
+Last-Update: 2025-01-28
+
+--- a/magic/Magdir/printer
++++ b/magic/Magdir/printer
+@@ -5,7 +5,7 @@
+ #
+ 
+ # PostScript, updated by Daniel Quinlan (quinlan@yggdrasil.com)
+-0	string		%!		PostScript document text
++0	string		%!PS		PostScript document text
+ !:mime	application/postscript
+ !:apple	ASPSTEXT
+ >2	string		PS-Adobe-	conforming

@@ -1,0 +1,71 @@
+Subject: Fix msdosdate endianness
+Origin: upstream, commit FILE5_46-70-g4e2c7d3d <https://github.com/file/file/commit/FILE5_46-70-g4e2c7d3d>
+Author: Christos Zoulas <christos@zoulas.com>
+Date: Thu Mar 20 17:46:50 2025 +0000
+Bug-Debian: https://bugs.debian.org/1100712
+
+    - fix msdosdate endianness
+    - remove day of the week as some platforms miscalculate it.
+    (Christoph Biedl)
+
+FIXME:
+- Adjust subject and patch file name
+
+--- a/src/print.c
++++ b/src/print.c
+@@ -354,7 +354,7 @@
+ 	tm.tm_mon = ((v >> 5) & 0xf) - 1;
+ 	tm.tm_year = (v >> 9) + 80;
+ 
+-	if (strftime(buf, bsize, "%a, %b %d %Y", &tm) == 0)
++	if (strftime(buf, bsize, "%b %d %Y", &tm) == 0)
+ 		goto out;
+ 
+ 	return buf;
+--- a/src/softmagic.c
++++ b/src/softmagic.c
+@@ -1042,6 +1042,14 @@
+ 		return FILE_LEDOUBLE;
+ 	case FILE_LEDOUBLE:
+ 		return FILE_BEDOUBLE;
++	case FILE_BEMSDOSDATE:
++		return FILE_LEMSDOSDATE;
++	case FILE_LEMSDOSDATE:
++		return FILE_BEMSDOSDATE;
++	case FILE_BEMSDOSTIME:
++		return FILE_LEMSDOSTIME;
++	case FILE_LEMSDOSTIME:
++		return FILE_BEMSDOSTIME;
+ 	default:
+ 		return type;
+ 	}
+@@ -1159,11 +1167,7 @@
+ 		return 1;
+ 	case FILE_SHORT:
+ 	case FILE_MSDOSDATE:
+-	case FILE_LEMSDOSDATE:
+-	case FILE_BEMSDOSDATE:
+ 	case FILE_MSDOSTIME:
+-	case FILE_LEMSDOSTIME:
+-	case FILE_BEMSDOSTIME:
+ 		if (cvt_16(p, m) == -1)
+ 			goto out;
+ 		return 1;
+@@ -1217,6 +1221,8 @@
+ 		return 1;
+ 	}
+ 	case FILE_BESHORT:
++	case FILE_BEMSDOSDATE:
++	case FILE_BEMSDOSTIME:
+ 		p->h = CAST(short, BE16(p->hs));
+ 		if (cvt_16(p, m) == -1)
+ 			goto out;
+@@ -1237,6 +1243,8 @@
+ 			goto out;
+ 		return 1;
+ 	case FILE_LESHORT:
++	case FILE_LEMSDOSDATE:
++	case FILE_LEMSDOSTIME:
+ 		p->h = CAST(short, LE16(p->hs));
+ 		if (cvt_16(p, m) == -1)
+ 			goto out;

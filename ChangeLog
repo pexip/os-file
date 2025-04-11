@@ -1,6 +1,64 @@
-2922-12-26  12:26  Christos Zoulas <christos@zoulas.com>
+2024-11-27  14:44  Christos Zoulas <christos@zoulas.com>
 
-	* release 5.43
+	* release 5.46
+	* Add OFFPOSITIVE
+
+2024-11-25  13:56  Christos Zoulas <christos@zoulas.com>
+	
+	* avoid leaking symbols in libmagic
+
+2024-11-10  13:56  Christos Zoulas <christos@zoulas.com>
+	
+	* PR/562: jsummers: Search/regex offsets are absolute to the
+	  beginning of the file, so adjust them by subtracting the
+	  offset that the "use" starts so that we don't double-count it.
+
+
+2024-11-09  19:30  Christos Zoulas <christos@zoulas.com>
+ 	* PR/543: matshch: bump nbuf so we can get the flags into the buffer.
+
+
+2024-11-02  14:34  Christos Zoulas <christos@zoulas.com>
+
+ 	* Add Android elf notes (enh)
+
+2023-12-29  12:55  Christos Zoulas <christos@zoulas.com>
+
+	* Add limit for number of magic warnings allowed
+
+2023-07-29  12:55  Christos Zoulas <christos@zoulas.com>
+
+	* check regex bounds (found by clusterfuzz)
+
+2023-07-27  15:45  Christos Zoulas <christos@zoulas.com>
+
+	* release 5.45
+
+2023-07-17  11:53  Christos Zoulas <christos@zoulas.com>
+
+	* PR/465: psrok1: Avoid muslc asctime_r crash
+
+2023-05-21  13:05  Christos Zoulas <christos@zoulas.com>
+	
+	* add SIMH tape format support
+
+2023-02-09  12:50  Christos Zoulas <christos@zoulas.com>
+	
+	* bump the max size of the elf section notes to be read to 128K
+	  and make it configurable
+
+2023-01-08   1:08  Christos Zoulas <christos@zoulas.com>
+
+	* PR/415: Fix decompression with program returning empty
+
+2022-12-26   1:47  Christos Zoulas <christos@zoulas.com>
+
+	* PR/408: fix -p with seccomp
+	* PR/412: fix MinGW compilation
+
+2022-12-26  12:26  Christos Zoulas <christos@zoulas.com>
+
+	* release 5.44
 
 2022-12-14   9:24  Christos Zoulas <christos@zoulas.com>
 

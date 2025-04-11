@@ -35,7 +35,7 @@
 #include "file.h"
 
 #ifndef lint
-FILE_RCSID("@(#)$File: compress.c,v 1.154 2022/12/26 17:35:45 christos Exp $")
+FILE_RCSID("@(#)$File: compress.c,v 1.158 2024/11/10 16:52:27 christos Exp $")
 #endif
 
 #include "magic.h"
@@ -46,6 +46,7 @@ FILE_RCSID("@(#)$File: compress.c,v 1.154 2022/12/26 17:35:45 christos Exp $")
 #ifdef HAVE_SPAWN_H
 #include <spawn.h>
 #endif
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
@@ -88,6 +89,13 @@ typedef void (*sig_t)(int);
 #if defined(HAVE_LZLIB_H) && defined(LZLIBSUPPORT)
 #define BUILTIN_LZLIB
 #include <lzlib.h>
+#endif
+
+#ifdef notyet
+#if defined(HAVE_LRZIP_H) && defined(LRZIPLIBSUPPORT)
+#define BUILTIN_LRZIP
+#include <Lrzip.h>
+#endif
 #endif
 
 #ifdef DEBUG
@@ -143,7 +151,6 @@ lzmacmp(const unsigned char *buf)
 }
 
 #define gzip_flags "-cd"
-#define lrzip_flags "-do"
 #define lzip_flags gzip_flags
 
 static const char *gzip_args[] = {
@@ -162,7 +169,7 @@ static const char *xz_args[] = {
 	"xz", "-cd", NULL
 };
 static const char *lrzip_args[] = {
-	"lrzip", lrzip_flags, NULL
+	"lrzip", "-qdf", "-", NULL
 };
 static const char *lz4_args[] = {
 	"lz4", "-cd", NULL
@@ -187,6 +194,7 @@ file_private const struct {
 #define METH_BZIP	7
 #define METH_XZ		9
 #define METH_LZIP	8
+#define METH_LRZIP	10
 #define METH_ZSTD	12
 #define METH_LZMA	13
 #define METH_ZLIB	14
@@ -244,6 +252,11 @@ file_private int uncompresszstd(const unsigned char *, unsigned char **, size_t,
 file_private int uncompresslzlib(const unsigned char *, unsigned char **, size_t,
     size_t *, int);
 #endif
+#ifdef BUILTIN_LRZIP
+file_private int uncompresslrzip(const unsigned char *, unsigned char **, size_t,
+    size_t *, int);
+#endif
+
 
 static int makeerror(unsigned char **, size_t *, const char *, ...)
     __attribute__((__format__(__printf__, 3, 4)));
@@ -408,7 +421,7 @@ file_protected ssize_t
 sread(int fd, void *buf, size_t n, int canbepipe __attribute__((__unused__)))
 {
 	ssize_t rv;
-#ifdef FIONREAD
+#if defined(FIONREAD) && !defined(__MINGW32__)
 	int t = 0;
 #endif
 	size_t rn = n;
@@ -416,7 +429,7 @@ sread(int fd, void *buf, size_t n, int canbepipe __attribute__((__unused__)))
 	if (fd == STDIN_FILENO)
 		goto nocheck;
 
-#ifdef FIONREAD
+#if defined(FIONREAD) && !defined(__MINGW32__)
 	if (canbepipe && (ioctl(fd, FIONREAD, &t) == -1 || t == 0)) {
 #ifdef FD_ZERO
 		ssize_t cnt;
@@ -609,6 +622,7 @@ uncompresszlib(const unsigned char *old, unsigned char **newch,
 	int rc;
 	z_stream z;
 
+	DPRINTF("builtin zlib decompression\n");
 	z.next_in = CCAST(Bytef *, old);
 	z.avail_in = CAST(uint32_t, *n);
 	z.next_out = *newch;
@@ -650,6 +664,7 @@ uncompressbzlib(const unsigned char *old, unsigned char **newch,
 	int rc;
 	bz_stream bz;
 
+	DPRINTF("builtin bzlib decompression\n");
 	memset(&bz, 0, sizeof(bz));
 	rc = BZ2_bzDecompressInit(&bz, 0, 0);
 	if (rc != BZ_OK)
@@ -690,6 +705,7 @@ uncompressxzlib(const unsigned char *old, unsigned char **newch,
 	int rc;
 	lzma_stream xz;
 
+	DPRINTF("builtin xzlib decompression\n");
 	memset(&xz, 0, sizeof(xz));
 	rc = lzma_auto_decoder(&xz, UINT64_MAX, 0);
 	if (rc != LZMA_OK)
@@ -729,6 +745,7 @@ uncompresszstd(const unsigned char *old, unsigned char **newch,
 	ZSTD_inBuffer in;
 	ZSTD_outBuffer out;
 
+	DPRINTF("builtin zstd decompression\n");
 	if ((zstd = ZSTD_createDStream()) == NULL) {
 		return makeerror(newch, n, "No ZSTD decompression stream, %s",
 		    strerror(errno));
@@ -777,6 +794,7 @@ uncompresslzlib(const unsigned char *old, unsigned char **newch,
 
 	bufp = *newch;
 
+	DPRINTF("builtin lzlib decompression\n");
 	dec = LZ_decompress_open();
 	if (!dec) {
 		return makeerror(newch, n, "unable to allocate LZ_Decoder");
@@ -825,6 +843,59 @@ err:
 }
 #endif
 
+#ifdef BUILTIN_LRZIP
+file_private int
+uncompresslrzip(const unsigned char *old, unsigned char **newch,
+    size_t bytes_max, size_t *n, int extra __attribute__((__unused__)))
+{
+	Lrzip *lr;
+	FILE *in, *out;
+	int res = OKDATA;
+
+	DPRINTF("builtin rlzip decompression\n");
+	lr = lrzip_new(LRZIP_MODE_DECOMPRESS);
+	if (lr == NULL) {
+		res = makeerror(newch, n, "unable to create an lrzip decoder");
+		goto out0;
+	}
+	lrzip_config_env(lr);
+	in = fmemopen(RCAST(void *, old), bytes_max, "r");
+	if (in == NULL) {
+		res = makeerror(newch, n, "unable to construct input file");
+		goto out1;
+	}
+	if (!lrzip_file_add(lr, in)) {
+		res = makeerror(newch, n, "unable to add input file");
+		goto out2;
+	}
+	*newch = calloc(*n = 2 * bytes_max, 1);
+	if (*newch == NULL) {
+		res = makeerror(newch, n, "unable to allocate output buffer");
+		goto out2;
+	}
+	out = fmemopen(*newch, *n, "w");
+	if (out == NULL) {
+		free(*newch);
+		res = makeerror(newch, n, "unable to allocate output file");
+		goto out2;
+	}
+	lrzip_outfile_set(lr, out);
+	if (lrzip_run(lr)) {
+		free(*newch);
+		res = makeerror(newch, n, "unable to decompress file");
+		goto out3;
+	}
+	*n = (size_t)ftell(out);
+out3:
+	fclose(out);
+out2:
+	fclose(in);
+out1:
+	lrzip_free(lr);
+out0:
+	return res;
+}
+#endif
 
 static int
 makeerror(unsigned char **buf, size_t *len, const char *fmt, ...)
@@ -833,11 +904,13 @@ makeerror(unsigned char **buf, size_t *len, const char *fmt, ...)
 	va_list ap;
 	int rv;
 
+	DPRINTF("Makeerror %s\n", fmt);
 	free(*buf);
 	va_start(ap, fmt);
 	rv = vasprintf(&msg, fmt, ap);
 	va_end(ap);
 	if (rv < 0) {
+		DPRINTF("Makeerror failed");
 		*buf = NULL;
 		*len = 0;
 		return NODATA;
@@ -1001,6 +1074,10 @@ methodname(size_t method)
 	case METH_LZIP:
 		return "lzlib";
 #endif
+#ifdef BUILTIN_LRZIP
+	case METH_LRZIP:
+		return "lrzip";
+#endif
 	default:
 		return compr[method].argv[0];
 	}
@@ -1034,6 +1111,10 @@ getdecompressor(size_t method))(const unsigned char *, unsigned char **, size_t,
 	case METH_LZIP:
 		return uncompresslzlib;
 #endif
+#ifdef BUILTIN_LRZIP
+	case METH_LRZIP:
+		return uncompresslrzip;
+#endif
 	default:
 		return NULL;
 	}
@@ -1048,7 +1129,7 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 	pid_t pid;
 	pid_t writepid = -1;
 	size_t i;
-	ssize_t r;
+	ssize_t r, re;
 	char *const *args;
 #ifdef HAVE_POSIX_SPAWNP
 	posix_spawn_file_actions_t fa;
@@ -1103,6 +1184,7 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 
 	handledesc(&fa, fd, fdp);
 
+	DPRINTF("Executing %s\n", compr[method].argv[0]);
 	status = posix_spawnp(&pid, compr[method].argv[0], &fa, NULL,
 	    args, NULL);
 
@@ -1128,6 +1210,7 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 		 * do not modify fdp[i][j].
 		 */
 		handledesc(NULL, fd, fdp);
+		DPRINTF("Executing %s\n", compr[method].argv[0]);
 
 		(void)execvp(compr[method].argv[0], args);
 		dprintf(STDERR_FILENO, "exec `%s' failed, %s",
@@ -1146,6 +1229,7 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 		if (writepid == (pid_t)-1) {
 			rv = makeerror(newch, n, "Write to child failed, %s",
 			    strerror(errno));
+			DPRINTF("Write to child failed\n");
 			goto err;
 		}
 		closefd(fdp[STDIN_FILENO], 1);
@@ -1153,6 +1237,7 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 
 	rv = OKDATA;
 	r = sread(fdp[STDOUT_FILENO][0], *newch, bytes_max, 0);
+	DPRINTF("read got %zd\n", r);
 	if (r < 0) {
 		rv = ERRDATA;
 		DPRINTF("Read stdout failed %d (%s)\n", fdp[STDOUT_FILENO][0],
@@ -1165,15 +1250,17 @@ uncompressbuf(int fd, size_t bytes_max, size_t method, int nofork,
 		 * errors, otherwise we risk the child blocking and never
 		 * exiting.
 		 */
+		DPRINTF("Closing stdout for bytes_max\n");
 		closefd(fdp[STDOUT_FILENO], 0);
 		goto ok;
 	}
-	if ((r = sread(fdp[STDERR_FILENO][0], *newch, bytes_max, 0)) > 0) {
+	if ((re = sread(fdp[STDERR_FILENO][0], *newch, bytes_max, 0)) > 0) {
+		DPRINTF("Got stuff from stderr %s\n", *newch);
 		rv = ERRDATA;
 		r = filter_error(*newch, r);
 		goto ok;
 	}
-	if  (r == 0)
+	if  (re == 0)
 		goto ok;
 	rv = makeerror(newch, n, "Read stderr failed, %s",
 	    strerror(errno));

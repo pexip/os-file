@@ -1,3 +1,66 @@
+file (1:5.46-5) unstable; urgency=high
+
+  * Cherry-pick "Some zip files are misclassified as data".
+    Closes: #1102577
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 11 Apr 2025 07:25:13 +0200
+
+file (1:5.46-4) unstable; urgency=high
+
+  * Cherry-pick "Fix stack overrun". Closes: #1101470
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 28 Mar 2025 18:53:57 +0100
+
+file (1:5.46-3) unstable; urgency=medium
+
+  * Cherry-pick some fixes from upstream. Closes: #1100712
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 20 Mar 2025 20:08:48 +0100
+
+file (1:5.46-2) unstable; urgency=medium
+
+  * Upload to unstable
+  * Fix size information for 128x128 ico files. Closes: #1098991
+  * Stricter PostScript magic. Closes: #988451
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Thu, 13 Mar 2025 20:27:59 +0100
+
+file (1:5.46-1) experimental; urgency=medium
+
+  * Upload to experimental
+  * New upstream version 5.46
+    Closes: #800328, #976313
+  * libmagic-mgc: Drop old versioned dependency, also Closes: #1069915
+    Thanks Steve Langasek, and rest in peace.
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 02 Mar 2025 13:36:20 +0100
+
+file (1:5.45-3) unstable; urgency=medium
+
+  * Cherry-pick "Recognize unified diff output". Closes: #1063522
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Fri, 01 Mar 2024 18:30:40 +0100
+
+file (1:5.45-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.  Closes: #1063113
+
+ -- Benjamin Drung <bdrung@debian.org>  Fri, 01 Mar 2024 11:59:20 +0000
+
+file (1:5.45-2) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 03 Sep 2023 11:40:05 +0200
+
+file (1:5.45-1) experimental; urgency=medium
+
+  * New upstream version 5.45
+  * Upload to experimental
+
+ -- Christoph Biedl <debian.axhn@manchmal.in-ulm.de>  Sun, 30 Jul 2023 21:39:59 +0200
+
 file (1:5.44-3) unstable; urgency=medium
 
   * Cherry-pick fixes related to APK file detection
