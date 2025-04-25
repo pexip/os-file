@@ -1,0 +1,76 @@
+Subject: Fix OpenStreetMap (Christoph Biedl)
+Origin: upstream, commit FILE5_46-68-g5089651f <https://github.com/file/file/commit/FILE5_46-68-g5089651f>
+Author: Christos Zoulas <christos@zoulas.com>
+Date: Thu Mar 20 15:46:35 2025 +0000
+
+--- a/magic/Magdir/sgml
++++ b/magic/Magdir/sgml
+@@ -15,7 +15,10 @@
+ !:mime	image/svg+xml
+ !:ext   svg
+ 
++0	string/t		\<?xml\ version=
++!:strength +40
+ >14	regex		['"\ \t]*[0-9.]+['"\ \t]*
++
+ # Sitemap file
+ >>19	search/4096	\<urlset		XML Sitemap document text
+ !:mime	application/xml-sitemap
+@@ -37,9 +40,7 @@
+ # xhtml
+ >19	search/4096/cWbt	\<!doctype\ html	XHTML document text
+ >>15	string		>\0	(version %.3s)
+-!:strength + 15
+ !:mime	application/xhtml+xml
+-
+ >19	search/4096/cWbt	\<html\ xmlns=		XHTML document text
+ >>15	string		>\0	(version %.3s)
+ !:mime	application/xhtml+xml
+@@ -57,14 +58,11 @@
+ # avoid misdetection as JavaScript
+ 0	string/cWt	\<!doctype\ html	HTML document text
+ !:mime	text/html
+-!:strength + 30
+ 0	string/ct	\<html>	HTML document text
+ !:mime	text/html
+-!:strength + 30
+ 0	string/ct	\<!--
+ >&0	search/4096/cWt	\<!doctype\ html	HTML document text
+ !:mime	text/html
+-!:strength + 30
+ >&0	search/4096/ct	\<html>	HTML document text
+ !:mime	text/html
+ 
+@@ -127,13 +125,21 @@
+ 0	search/1/cwt	\<?xml			XML document text
+ !:mime	text/xml
+ !:strength + 30
++0	string/t		\<?xml\ version\ "	XML
++!:mime	text/xml
++!:strength + 30
+ 0	string/t		\<?xml\ version="	XML
+ !:mime	text/xml
+ !:strength + 30
+ >15	string/t	>\0			%.3s document text
+ >>23	search/1	\<xsl:stylesheet	(XSL stylesheet)
+ >>24	search/1	\<xsl:stylesheet	(XSL stylesheet)
+-
++0	string/t	\<?xml\ version='	XML
++!:mime	text/xml
++!:strength + 30
++>15	string/t	>\0			%.3s document text
++>>23	search/1	\<xsl:stylesheet	(XSL stylesheet)
++>>24	search/1	\<xsl:stylesheet	(XSL stylesheet)
+ 0	search/1/wt	\<?XML			broken XML document text
+ !:mime	text/xml
+ !:strength - 10
+--- /dev/null
++++ b/tests/osm.result
+@@ -0,0 +1 @@
++OpenStreetMap XML data, ASCII text
+--- /dev/null
++++ b/tests/osm.testfile
+@@ -0,0 +1,3 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<osm version="0.6" generator="CGImap 0.0.2">
++</osm>
